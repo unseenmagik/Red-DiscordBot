@@ -12,7 +12,7 @@ class CustomCommands:
         self.bot = bot
         self.c_commands = fileIO("data/customcom/commands.json", "load")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True,aliases=["learn"])
     @checks.mod_or_permissions(manage_server=True)
     async def addcom(self, ctx, command : str, *text):
         """Adds a custom command
@@ -63,7 +63,7 @@ class CustomCommands:
         else:
              await self.bot.say("`There are no custom commands in this server. Use addcom [command] [text]`")
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True,aliases=["forget"])
     @checks.mod_or_permissions(manage_server=True)
     async def delcom(self, ctx, command : str):
         """Deletes a custom command
