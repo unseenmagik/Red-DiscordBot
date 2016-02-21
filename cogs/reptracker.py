@@ -77,9 +77,6 @@ class RepTracker:
                 first_word = splitted[0]
         else:
             first_word = splitted[0]
-        print(splitted)
-        print(first_word)
-        print("------")
         reason = content[len(first_word)+1:]
         for member in mentions:
             if member.id in first_word.lower():
