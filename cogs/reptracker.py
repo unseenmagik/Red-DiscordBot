@@ -74,6 +74,7 @@ class RepTracker:
                 if "++" in first_word.lower() or "--" in first_word.lower():
                     if member == user:
                         await self.bot.send_message(message.channel,"You can't modify your own rep, jackass.")
+                        return
                 if "++" in first_word.lower():
                     self._process_scores(member.id,1)
                     self._add_reason(member.id,reason)
