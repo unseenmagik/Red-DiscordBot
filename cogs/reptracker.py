@@ -22,7 +22,7 @@ class RepTracker:
             self.scores[member_id]["score"] = score_to_add
 
     def _add_reason(self,member_id,reason):
-        if reason == "":
+        if reason.lstrip() == "":
             return
         if member_id in self.scores:
             if "reasons" in self.scores.get(member_id,{}):
@@ -55,7 +55,7 @@ class RepTracker:
         if self.scores.get(member.id,0) != 0:
             member_dict = self.scores[member.id]
             await self.bot.say(member.name+" has "+str(member_dict["score"])+" points!")
-            reasons = self._fmt_reasons(member_dict["reasons"])
+            reasons = self._fmt_reasons(member_dict.get("reasons",[]))
             if reasons: 
                 await self.bot.send_message(ctx.message.author,reasons)
         else:
@@ -67,7 +67,19 @@ class RepTracker:
         mentions = message.mentions
         if message.author.id == self.bot.user.id:
             return
-        first_word = content.split(" ")[0]
+        splitted = content.split(" ")
+        if len(splitted) > 1:
+            if "++" == splitted[0] or "--" == splitted[0]:
+                first_word = "".join(splitted[:2])
+            elif "++" == splitted[1] or "--" == splitted[1]:
+                first_word = "".join(splitted[:2])
+            else:
+                first_word = splitted[0]
+        else:
+            first_word = splitted[0]
+        print(splitted)
+        print(first_word)
+        print("------")
         reason = content[len(first_word)+1:]
         for member in mentions:
             if member.id in first_word.lower():

@@ -1,12 +1,13 @@
 import discord
 from discord.ext import commands
 import aiohttp
-import requests
-import feedparser
 from .utils.dataIO import fileIO
 from .utils.chat_formatting import *
-import os
-import json
+
+try:
+	import feedparser
+except:
+	feedparser = None
 
 class Runescape:
 	"""Runescape stuff"""
@@ -113,6 +114,9 @@ class Runescape:
 	@commands.command(no_pm=True)
 	async def alog(self, username : str):
 		"""Gets a users recent adventure log"""
+		if feedparser is None:
+			await self.bot.say("You'll need to run `pip3 install feedparser` before you can get a user's adventure log.")
+			return
 		url = self.alog_url+username
 		try:
 			page = await aiohttp.get(url)
@@ -139,18 +143,6 @@ class Runescape:
 			await self.bot.say("No user found.")
 		else:
 			await self.bot.say(self._fmt_hs(text))
-
-	@commands.command()
-	async def price(self,*item_name):
-		item_name = " ".join(item_name)
-		for itemid in self.items:
-			if name.lower() in self.items.get(itemid):
-				await self.bot.say(box(self.items.get(itemid)))
-		itemid = None
-		if itemid:
-			pass
-		else:
-			await self.bot.say("!price "+item_name)
 
 def setup(bot):
 	n = Runescape(bot)
