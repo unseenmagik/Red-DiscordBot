@@ -25,7 +25,9 @@ class CustomCommands:
             return
         server = ctx.message.server
         channel = ctx.message.channel
-        text = " ".join(text)
+        prefix = " ".join(ctx.message.content.split(" ")[0:2])
+        text = ctx.message.content[len(prefix)+1:]
+        command = command.lower()
         if not server.id in self.c_commands:
             self.c_commands[server.id] = {}
         cmdlist = self.c_commands[server.id]
@@ -97,7 +99,7 @@ class CustomCommands:
 
         if prefix and server.id in self.c_commands.keys():
             cmdlist = self.c_commands[server.id]
-            cmd = msg[len(prefix):]
+            cmd = msg[len(prefix):].lower()
             if cmd in cmdlist.keys():
                 await self.bot.send_message(message.channel, cmdlist[cmd])
 
