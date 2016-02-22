@@ -34,6 +34,24 @@ class Quotes:
         ret += "```"
         return ret
 
+    @commands.command()
+    async def delquote(self, num : int):
+        """Deletes a quote by its number
+
+           Use !allquotes to find quote numbers
+           Example: !delquote 3"""
+        if num > 0 and num <= len(self.quotes):
+            quotes = []
+            for i in range(len(self.quotes)):
+                if num-1 == i:
+                    await self.bot.say("Quote number "+str(num)+" has been deleted.")
+                else:
+                    quotes.append(self.quotes[i])
+            self.quotes = quotes
+            fileIO("data/quotes/quotes.json","save",self.quotes)
+        else:
+            await self.bot.say("Quote "+str(num)+" does not exist.")
+
     @commands.command(pass_context=True)
     async def allquotes(self,ctx):
         """Gets a list of all quotes"""
@@ -57,11 +75,13 @@ class Quotes:
                     !quote -> gets random quote
                     !quote 4 -> gets quote #4"""
         try:
-            message = int(message[0])
-            await self.bot.say(self._get_quote(message))
-            return
+            if len(message) == 1:
+                message = int(message[0])
+                await self.bot.say(self._get_quote(message))
+                return
         except:
-            message = " ".join(message)
+            pass
+        message = " ".join(message)
         if message.lstrip() == "":
             await self.bot.say(self._get_random_quote())
         else:
