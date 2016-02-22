@@ -21,7 +21,7 @@ class Tickets:
         else:
             return "No more tickets!"
 
-    def _add_question(self,author,message):
+    def _add_ticket(self,author,message):
         self.tickets.append({author.id:{"name":author.name,"message":message}})
         fileIO("data/tickets/tickets.json","save",self.tickets)
 
@@ -36,8 +36,8 @@ class Tickets:
 
            Example: !ticket The quick brown fox? -> adds ticket"""
         message = " ".join(message)
-        self._add_question(ctx.message.author,message)
-        await self.bot.say("Question added.")
+        self._add_ticket(ctx.message.author,message)
+        await self.bot.say("Ticket added.")
 
 def check_folder():
     if not os.path.exists("data/tickets"):
