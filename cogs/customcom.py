@@ -26,6 +26,7 @@ class CustomCommands:
         server = ctx.message.server
         to_replace = ctx.prefix + "addcom " + command + " "
         text = ctx.message.content.replace(to_replace, "")
+        command = command.lower()
         if not server.id in self.c_commands:
             self.c_commands[server.id] = {}
         cmdlist = self.c_commands[server.id]
@@ -51,6 +52,7 @@ class CustomCommands:
         server = ctx.message.server
         to_replace = ctx.prefix + "editcom " + command + " "
         text = ctx.message.content.replace(to_replace, "")
+        command = command.lower()
         if server.id in self.c_commands:
             cmdlist = self.c_commands[server.id]
             if command in cmdlist:
