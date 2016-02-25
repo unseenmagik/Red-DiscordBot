@@ -177,16 +177,18 @@ class Streams:
         url =  "https://api.twitch.tv/kraken/streams/" + stream
         async with aiohttp.get(url) as r:
             data = await r.json()
-        try:
-            if "stream" in data:
-                if data["stream"] != None:
-                    return True
-                else:
-                    return False
-            elif "error" in data:
-                return None
-        except:
-            return "error"
+            status = r.status
+        if status == 200:
+            try:
+                if "stream" in data:
+                    if data["stream"] != None:
+                        return True
+                    else:
+                        return False
+                elif "error" in data:
+                    return None
+            except:
+                return "error"
         return False
 
     async def stream_checker(self):

@@ -24,7 +24,7 @@ class CustomCommands:
             await send_cmd_help(ctx)
             return
         server = ctx.message.server
-        to_replace = ctx.prefix + "addcom " + command + " "
+        to_replace = " ".join(text[:2]) + " "
         text = ctx.message.content.replace(to_replace, "")
         command = command.lower()
         if not server.id in self.c_commands:
