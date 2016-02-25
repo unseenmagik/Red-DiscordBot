@@ -13,7 +13,29 @@ class Tickets:
 
     @property
     def ticket_limit(self):
-        return self.settings.get("TICKETS_PER_USER",0)
+        num = self.settings.get("TICKETS_PER_USER",-1)
+        if num == -1:
+            self.ticket_limit = 0
+            num = 0
+        return num
+
+    @ticket_limit.setter
+    def ticket_limit(self,num):
+        self.settings["TICKETS_PER_USER"] = num
+        fileIO("data/tickets/settings.json","save",self.settings)
+
+    @property
+    def reply_to_user(self):
+        ret = self.settings.get("REPLY_TO_USER")
+        if ret is None:
+            ret = False
+            self.reply_to_user = ret
+        return ret
+
+    @reply_to_user.setter
+    def reply_to_user(self,val):
+        self.settings["REPLY_TO_USER"] = val
+        fileIO("data/tickets/settings.json","save",self.settings)
 
     def _get_ticket(self):
         if len(self.tickets) > 0:
@@ -39,7 +61,11 @@ class Tickets:
     @checks.mod_or_permissions(manage_messages=True)
     async def nextticket(self,ctx):
         """Gets the next ticket"""
-        await self.bot.send_message(ctx.message.author,self._get_ticket())
+        if self.reply_to_user:
+            reply = ctx.message.author
+        else:
+            reply = ctx.message.channel
+        await self.bot.send_message(reply,self._get_ticket())
 
     @commands.command(pass_context=True)
     async def ticket(self,ctx,*,message):
@@ -78,6 +104,15 @@ class Tickets:
         fileIO("data/tickets/settings.json","save",self.settings)
         await self.bot.say("Tickets per user set to {}".format(num))
 
+    @ticketset.command(name="pm")
+    async def reply_to(self,user : bool):
+        """Determines whether !nextticket replys in a pm or not (bool)"""
+        if user:
+            self.reply_to_user = True
+        else:
+            self.reply_to_user = False
+        await self.bot.say("PM set to {}".format(user))
+
 def check_folder():
     if not os.path.exists("data/tickets"):
         print("Creating data/tickets folder...")
@@ -85,7 +120,7 @@ def check_folder():
 
 def check_file():
     tickets = []
-    settings = {"TICKETS_PER_USER":0,"REPLY_TO_CHANNEL":False}
+    settings = {"TICKETS_PER_USER":0,"REPLY_TO_USER":False}
 
     f = "data/tickets/tickets.json"
     if not fileIO(f, "check"):
