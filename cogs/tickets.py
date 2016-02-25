@@ -96,7 +96,7 @@ class Tickets:
 
     @ticketset.command(name="limit")
     async def tickets_per_user(self,num : int):
-        """Limits the number of tickets a user can have."""
+        """Limits the number of tickets a user can have 0 = infinite."""
         if num < 0:
             send_cmd_help(self.tickets_per_user)
             return
@@ -105,13 +105,13 @@ class Tickets:
         await self.bot.say("Tickets per user set to {}".format(num))
 
     @ticketset.command(name="pm")
-    async def reply_to(self,user : bool):
-        """Determines whether !nextticket replys in a pm or not (bool)"""
-        if user:
+    async def reply_to(self, boolvar: bool):
+        """Determines whether !nextticket replies in a pm or not - True/False"""
+        if boolvar:
             self.reply_to_user = True
         else:
             self.reply_to_user = False
-        await self.bot.say("PM set to {}".format(user))
+        await self.bot.say("PM set to {}".format(boolvar))
 
 def check_folder():
     if not os.path.exists("data/tickets"):
