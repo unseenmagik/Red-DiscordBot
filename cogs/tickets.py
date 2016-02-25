@@ -94,11 +94,11 @@ class Tickets:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @ticketset.command(name="limit")
-    async def tickets_per_user(self,num : int):
+    @ticketset.command(name="limit",pass_context=True)
+    async def tickets_per_user(self,ctx,num : int):
         """Limits the number of tickets a user can have 0 = infinite."""
         if num < 0:
-            send_cmd_help(self.tickets_per_user)
+            await send_cmd_help(ctx)
             return
         self.settings["TICKETS_PER_USER"] = num
         fileIO("data/tickets/settings.json","save",self.settings)
