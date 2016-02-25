@@ -11,6 +11,7 @@ import os
 import time
 import sys
 import logging
+import traceback
 
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
@@ -87,6 +88,7 @@ async def load(*, module : str):
     try:
         bot.load_extension(module)
     except Exception as e:
+        traceback.print_exc()
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say("Module enabled.")
