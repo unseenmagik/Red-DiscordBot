@@ -120,7 +120,7 @@ def check_folder():
 
 def check_file():
     tickets = []
-    settings = {"TICKETS_PER_USER":0,"REPLY_TO_USER":False}
+    settings = {"TICKETS_PER_USER":1,"REPLY_TO_USER":False}
 
     f = "data/tickets/tickets.json"
     if not fileIO(f, "check"):
