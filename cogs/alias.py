@@ -84,12 +84,16 @@ class Alias:
 
         if prefix and server.id in self.aliases:
             aliaslist = self.aliases[server.id]
-            alias = msg[len(prefix):]
+            alias = msg[len(prefix):].split(" ")[0]
+            args = msg[len(self.first_word(message.content)):]
             if alias in aliaslist.keys():
-                content = aliaslist[alias]
+                content = aliaslist[alias] + args
                 new_message = message
                 new_message.content = content
                 await self.bot.process_commands(new_message)
+
+    def first_word(self,msg):
+        return msg.split(" ")[0]
 
     def get_prefix(self, msg):
         for p in self.bot.command_prefix:
