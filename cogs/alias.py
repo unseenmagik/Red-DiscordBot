@@ -30,9 +30,12 @@ class Alias:
         if server.id not in self.aliases:
             self.aliases[server.id] = {}
         #curr_aliases = self.aliases[server.id]
-        self.aliases[server.id][command] = to_execute
-        fileIO("data/alias/aliases.json","save",self.aliases)
-        await self.bot.say("Alias '{}' added.".format(command))
+        if command not in self.bot.commands:
+            self.aliases[server.id][command] = to_execute
+            fileIO("data/alias/aliases.json","save",self.aliases)
+            await self.bot.say("Alias '{}' added.".format(command))
+        else:
+            await self.bot.say("Cannot add '{}' because it's a real bot command.".format(command))        
 
     @alias.command(name="help",pass_context=True)
     async def _help_alias(self,ctx,command):
