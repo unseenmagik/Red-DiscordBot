@@ -25,6 +25,19 @@ class Tickets:
         fileIO("data/tickets/settings.json","save",self.settings)
 
     @property
+    def keep_on_read(self):
+        ret = self.settings.get("KEEP_ON_READ")
+        if ret is None:
+            self.keep_on_read = False
+            ret = False
+        return ret
+    
+    @keep_on_read.setter
+    def keep_on_read(self,value):
+        self.settings["KEEP_ON_READ"] = bool(value)
+        fileIO("data/tickets/settings.json","save",self.settings)
+
+    @property
     def reply_to_user(self):
         ret = self.settings.get("REPLY_TO_USER")
         if ret is None:
@@ -42,8 +55,9 @@ class Tickets:
             ticket = self.tickets[0]
             for idnum in ticket:
                 ret = ticket[idnum].get("name","no_name")+": "+ticket[idnum].get("message","no_message")
-            self.tickets = self.tickets[1:]
-            fileIO("data/tickets/tickets.json","save",self.tickets)
+            if not self.keep_on_read:
+                self.tickets = self.tickets[1:]
+                fileIO("data/tickets/tickets.json","save",self.tickets)
             return ret
         else:
             return "No more tickets!"
@@ -87,12 +101,32 @@ class Tickets:
         fileIO("data/tickets/tickets.json","save",self.tickets)
         await self.bot.say("Tickets cleared.")
 
+    @commands.command(aliases=["dt"],pass_context=True)
+    @checks.mod_or_permissions(manage_messages=True)
+    async def deleteticket(self,ctx, num : int = 1):
+        """Deletes any number of tickets, default = 1"""
+        if num < 0:
+            await send_cmd_help(ctx)
+            return
+        if num > len(self.tickets):
+            num = len(self.tickets)
+            self.tickets = []
+        else:
+            self.tickets = self.tickets[num:]
+        fileIO("data/tickets/tickets.json","save",self.tickets)
+        await self.bot.say("{} tickets deleted.\n{} tickets remaining.".format(num,len(self.tickets)))
+
     @commands.group(pass_context=True)
     @checks.admin_or_permissions(manage_server=True)
     async def ticketset(self,ctx):
         """Ticket cog settings"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+            msg = "```"
+            for k, v in self.settings.items():
+                msg += str(k) + ": " + str(v) + "\n"
+            msg += "```"
+            await self.bot.say(msg)
 
     @ticketset.command(name="limit",pass_context=True)
     async def tickets_per_user(self,ctx,num : int):
@@ -103,6 +137,12 @@ class Tickets:
         self.settings["TICKETS_PER_USER"] = num
         fileIO("data/tickets/settings.json","save",self.settings)
         await self.bot.say("Tickets per user set to {}".format(num))
+
+    @ticketset.command(name="keep",pass_context=True)
+    async def _keep_on_read(self,ctx, val : bool):
+        """Determines whether the ticket is kept after it has been read. - True/False"""
+        self.keep_on_read = val
+        await self.bot.say("Keep on read set to {}".format(val))
 
     @ticketset.command(name="pm")
     async def reply_to(self, boolvar: bool):
@@ -120,7 +160,7 @@ def check_folder():
 
 def check_file():
     tickets = []
-    settings = {"TICKETS_PER_USER":1,"REPLY_TO_USER":False}
+    settings = {"TICKETS_PER_USER":1,"REPLY_TO_USER":False,"KEEP_ON_READ":False}
 
     f = "data/tickets/tickets.json"
     if not fileIO(f, "check"):
