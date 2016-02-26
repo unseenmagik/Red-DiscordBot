@@ -20,6 +20,11 @@ class MentionTracker:
         """Manage mentiontracker settings"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+            msg = "```"
+            for k, v in self.settings.items():
+                msg += str(k) + ": " + str(v) + "\n"
+            msg += "```"
+            await self.bot.say(msg)
 
     @mentionset.command(name="limit",pass_context=True)
     async def _mentionset_limit(self,ctx,num : int):
