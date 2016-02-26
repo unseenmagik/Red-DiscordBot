@@ -107,7 +107,7 @@ class MentionTracker:
             return
         mentions = message.mentions
         for mention in mentions:
-            if mention != message.author and mention.id in self.mail:# and mention.status != 'online':
+            if mention != message.author and mention.id in self.mail and 'on' not in mention.status:
                 limit = self.settings.get("MENTION_TIME_LIMIT",0)
                 delta = datetime.timedelta(minutes=limit)
                 if self._last_time(mention) + delta < datetime.datetime.utcnow():
