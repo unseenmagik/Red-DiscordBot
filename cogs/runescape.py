@@ -112,8 +112,9 @@ class Runescape:
         return ret
 
     @commands.command(no_pm=True)
-    async def alog(self, username : str):
+    async def alog(self,*, username):
         """Gets a users recent adventure log"""
+        username = username.replace(" ","_")
         if feedparser is None:
             await self.bot.say("You'll need to run `pip3 install feedparser` before you can get a user's adventure log.")
             return
@@ -131,8 +132,9 @@ class Runescape:
         await self.bot.say(self._fmt_alog(username,titles))
 
     @commands.command(no_pm=True)
-    async def hs(self, username : str):
+    async def hs(self,*, username):
         """Gets hiscores info"""
+        username = username.replace(" ","_")
         url = self.base_url+username
         try:
             page = await aiohttp.get(url)
