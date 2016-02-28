@@ -56,6 +56,13 @@ async def on_command(command, ctx):
 @bot.event
 async def on_message(message):
     if user_allowed(message):
+        if message.channel.is_private:
+            has_prefix = False
+            for prefix in settings["PREFIXES"]:
+                if message.content.startswith(prefix):
+                    has_prefix = True
+            if not has_prefix:
+                message.content = settings["PREFIXES"][0]+message.content
         await bot.process_commands(message)
 
 @bot.event
@@ -240,10 +247,13 @@ async def shutdown():
     """Shuts down Red"""
     await bot.logout()
 
-@bot.command()
-@checks.is_owner()
-async def join(invite_url : discord.Invite):
+@bot.command(pass_context=True)
+async def join(ctx,invite_url : discord.Invite):
     """Joins new server"""
+    author = ctx.message.author
+    channel = ctx.message.channel
+    if author.id != settings.owner or not channel.is_private:
+        return
     try:
         await bot.accept_invite(invite_url)
         await bot.say("Server joined.")
