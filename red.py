@@ -12,6 +12,7 @@ import time
 import sys
 import logging
 import traceback
+import aiohttp
 
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
@@ -221,6 +222,18 @@ async def status(ctx, *status : str):
         await bot.change_status(None)
     await bot.say("Done.")
 
+@_set.command()
+@checks.is_owner()
+async def avatar(url : str):
+    """Sets Red's avatar"""
+    try:
+        async with aiohttp.get(url) as r:
+            data = await r.read()
+        await bot.edit_profile(settings["PASSWORD"], avatar=data)
+        await bot.say("Done.")
+    except:
+        await bot.say("Error.")
+
 @bot.command()
 @checks.is_owner()
 async def shutdown():
@@ -378,6 +391,15 @@ def check_configs():
 
         with open(settings_path, "w") as f:
             f.write(json.dumps(settings))
+    else: # Undoing the changes made by the broken pull request
+        data = load_settings()
+        if "default" in data:
+            data["ADMIN_ROLE"] = data["default"]["ADMIN_ROLE"]
+            data["MOD_ROLE"] = data["default"]["MOD_ROLE"]
+            del data["default"]
+            print("Rolling back settings to previous format...")
+            with open(settings_path, "w") as f:
+                f.write(json.dumps(data, indent=4,sort_keys=True,separators=(',',' : ')))
 
     cogs_s_path = "data/red/cogs.json"
     cogs = {}
