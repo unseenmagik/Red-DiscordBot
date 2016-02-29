@@ -140,13 +140,20 @@ class Emotes:
 
         valid_emotes = self.available_emotes[message.server.id]
 
-        for word in message.content.split(' '):
+        splitted = message.content.split(' ')
+
+        for word in splitted:
             for emote in valid_emotes:
                 if word == emote.get("name",""):
                     fname = 'data/emotes/{}/{}'.format(emote["chan_id"],emote["file_name"])
                     if not os.path.exists(fname):
                         await self._add_emote(chan_id)
                     await self.bot.send_file(message.channel,fname)
+                    if len(splitted) == 1:
+                        try:
+                            await self.bot.delete_message(message)
+                        except:
+                            return
                     break
 
 def check_folders():
