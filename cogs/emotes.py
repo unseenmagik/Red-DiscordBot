@@ -24,6 +24,15 @@ class Emotes:
     def save_available_emotes(self):
         fileIO("data/emotes/available_emotes.json","save",self.available_emotes)
 
+    @property
+    def limit_per_message(self):
+        return self.settings.get("LIMIT_PER_MESSAGE",5)
+
+    @limit_per_message.setter
+    def limit_per_message(self,value):
+        self.settings["LIMIT_PER_MESSAGE"] = int(value)
+        self.save_settings()
+
     def update_emote_list(self):
         resp = requests.get(self.emote_url)
         data = resp.json().get("emoticons",{})
@@ -60,6 +69,13 @@ class Emotes:
             await self.bot.reply("emotes are now enabled.")
         else:
             await self.bot.reply("emotes are now disabled.")
+
+    @emoteset.command(name="limit",pass_context=True)
+    async def _emoteset_limit(self,ctx,limit : int):
+        """Emote limit per message."""
+        if limit < 0: await send_cmd_help(ctx)
+        self.limit_per_message = limit
+        await self.bot.say("Limit set to {}.".format(limit))
 
     def _write_image(self, chan_id, name, image_data):
         #Assume channel folder already exists
@@ -142,6 +158,8 @@ class Emotes:
 
         splitted = message.content.split(' ')
 
+        count = 0
+
         for word in splitted:
             for emote in valid_emotes:
                 if word == emote.get("name",""):
@@ -154,6 +172,9 @@ class Emotes:
                             await self.bot.delete_message(message)
                         except:
                             return
+                    count += 1
+                    if self.limit_per_message != 0 and count >= self.limit_per_message:
+                        return
                     break
 
 def check_folders():
@@ -165,7 +186,7 @@ def check_files():
     f = "data/emotes/settings.json"
     if not fileIO(f, "check"):
         print("Creating empty settings.json...")
-        fileIO(f, "save", {})
+        fileIO(f, "save", {"LIMIT_PER_MESSAGE":5})
 
     f = "data/emotes/available_emotes.json"
     if not fileIO(f, "check"):
