@@ -121,24 +121,12 @@ class MentionTracker:
                 if self._last_time(mention) + delta < datetime.datetime.utcnow():
                     self._add_mail(mention.id,message)
 
-    async def mention_notifier(self):
-        DELAY = 300
-        while "MentionTracker" in self.bot.cogs:
-            to_check = {}
-            for user, mail in self.mail.items():
-                if len(mail) > 0:
-                    to_check.update({user:mail})
-
-            for server in self.bot.servers:
-                if len(to_check) == 0: break
-                for member in server.members:
-                    if len(to_check) == 0: break
-                    if member.id in to_check and member.status == Status.online:
-                        self.bot.send_message(member,"You have mail!\n\nExecute {} to view.".format(inline("mention read")))
-                        del to_check[member.id]
-
-            await asyncio.sleep(DELAY)
-
+    async def user_update(self,before,after):
+        if before.id in self.mail and len(self.mail[before.id]) > 0:
+            print("user update")
+            print("before: {}\nafter: {}".format(before.status==Status.online,after.status==Status.online))
+            if before.status != Status.online and after.status == Status.online:
+                self.bot.send_message(after,"You have mail!\n\nExecute {} to view.".format(inline("mention read")))
 
 def check_folder():
     if not os.path.exists("data/mentiontracker"):
@@ -164,6 +152,5 @@ def setup(bot):
     check_file()
     n = MentionTracker(bot)
     bot.add_listener(n.tracker, "on_message")
-    loop = asyncio.get_event_loop()
-    loop.create_task(n.mention_notifier())
+    bot.add_listener(n.user_update, "on_member_update")
     bot.add_cog(n)
