@@ -63,8 +63,6 @@ class Emotes:
 
     def _write_image(self, chan_id, name, image_data):
         #Assume channel folder already exists
-        if os.path.exists('data/emotes/{}/{}'.format(chan_id,name)):
-            return
         with open('data/emotes/{}/{}'.format(chan_id,name),'wb') as f:
             f.write(image_data)
 
@@ -88,17 +86,18 @@ class Emotes:
                 file_name = url.split('/')[-1]
                 if url == "" or name == "":
                     continue
-                try:
-                    async with aiohttp.get(url) as r:
-                        image = await r.content.read()
-                except Exception as e:
-                    print("Huh, I have no idea what errors aiohttp throws.")
-                    print("This is one of them:")
-                    print(e)
-                    print(dir(e))
-                    print("------")
-                    return
-                self._write_image(chan_id,file_name,image)
+                if not os.path.exists('data/emotes/{}/{}'.format(chan_id,file_name)):
+                    try:
+                        async with aiohttp.get(url) as r:
+                            image = await r.content.read()
+                    except Exception as e:
+                        print("Huh, I have no idea what errors aiohttp throws.")
+                        print("This is one of them:")
+                        print(e)
+                        print(dir(e))
+                        print("------")
+                        return
+                    self._write_image(chan_id,file_name,image)
                 if server.id not in self.available_emotes:
                     self.available_emotes[server.id] = {}
                 self.available_emotes[server.id].append({
@@ -106,7 +105,7 @@ class Emotes:
                                                     "file_name":file_name,
                                                     "chan_id":chan_id
                                                 })
-                self.save_available_emotes()
+        self.save_available_emotes()
 
     @commands.command(pass_context=True)
     async def emote(self,ctx,emote_name:str):
@@ -118,7 +117,7 @@ class Emotes:
         if emote_name in server_emotes:
             await self.bot.say("This server already has '{}'".format(emote_name))
             return
-        self.bot.say("Retrieving emotes from '{}'. Please wait a moment.".format(emote_name))
+        await self.bot.say("Retrieving emotes from '{}'. Please wait a moment.".format(emote_name))
         for emote in self.emote_list:
             if emote_name == emote.get("regex",""):
                 chan_id = emote["images"][0].get("emoticon_set",-1)
