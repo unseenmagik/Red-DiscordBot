@@ -118,6 +118,7 @@ class Emotes:
         if emote_name in server_emotes:
             await self.bot.say("This server already has '{}'".format(emote_name))
             return
+        self.bot.say("Retrieving emotes from '{}'. Please wait a moment.".format(emote_name))
         for emote in self.emote_list:
             if emote_name == emote.get("regex",""):
                 chan_id = emote["images"][0].get("emoticon_set",-1)
