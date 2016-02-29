@@ -149,7 +149,7 @@ class Emotes:
                 await self._add_emote(server,chan_id)
                 await self.bot.say("'{}' and other channel emotes added.".format(emote_name))
                 return
-        self.bot.say("No such emote '{}' found.".format(emote_name))
+        await self.bot.say("No such emote '{}' found.".format(emote_name))
 
     async def check_messages(self, message):
         if message.author.id == self.bot.user.id:
