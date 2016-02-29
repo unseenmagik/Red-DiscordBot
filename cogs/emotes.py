@@ -178,7 +178,7 @@ class Emotes:
                         except:
                             return
                     count += 1
-                    if self.limit_per_message != 0 and count >= self.limit_per_message:
+                    if self.get_limit_per_message(message.server) != 0 and count >= self.get_limit_per_message(message.server):
                         return
                     break
 
