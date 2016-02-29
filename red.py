@@ -71,6 +71,8 @@ async def on_command_error(error, ctx):
         await send_cmd_help(ctx)
     elif isinstance(error, commands.BadArgument):
         await send_cmd_help(ctx)
+    elif isinstance(error, commands.CheckFailure):
+        await bot.send_message(ctx.message.author,"You likely don't have permissions for that.")
 
 async def send_cmd_help(ctx):
     if ctx.invoked_subcommand:

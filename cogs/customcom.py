@@ -12,7 +12,7 @@ class CustomCommands:
         self.bot = bot
         self.c_commands = fileIO("data/customcom/commands.json", "load")
 
-    @commands.command(pass_context=True, no_pm=True,aliases=["learn"])
+    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
     async def addcom(self, ctx, command : str, *text):
         """Adds a custom command
@@ -24,8 +24,8 @@ class CustomCommands:
             await send_cmd_help(ctx)
             return
         server = ctx.message.server
-        to_replace = " ".join(text[:2]) + " "
-        text = ctx.message.content.replace(to_replace, "")
+        to_replace = ctx.message.content.find(text[0])
+        text = ctx.message.content[to_replace:]
         command = command.lower()
         if not server.id in self.c_commands:
             self.c_commands[server.id] = {}
@@ -50,8 +50,8 @@ class CustomCommands:
             await send_cmd_help(ctx)
             return
         server = ctx.message.server
-        to_replace = ctx.prefix + "editcom " + command + " "
-        text = ctx.message.content.replace(to_replace, "")
+        to_replace = ctx.message.content.find(text[0])
+        text = ctx.message.content[to_replace:]
         command = command.lower()
         if server.id in self.c_commands:
             cmdlist = self.c_commands[server.id]
@@ -65,7 +65,7 @@ class CustomCommands:
         else:
              await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
 
-    @commands.command(pass_context=True, no_pm=True,aliases=["forget"])
+    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
     async def delcom(self, ctx, command : str):
         """Deletes a custom command
