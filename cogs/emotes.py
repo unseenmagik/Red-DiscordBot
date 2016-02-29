@@ -5,6 +5,7 @@ import asyncio
 from .utils import checks
 from .utils.dataIO import fileIO
 import os
+import requests
 from __main__ import send_cmd_help
 
 class Emotes:
@@ -13,34 +14,48 @@ class Emotes:
     def __init__(self, bot):
         self.bot = bot
         self.settings = fileIO("data/emotes/settings.json","load")
-        self.emote_list = {}
+        self.emote_list = []
         self.available_emotes = fileIO("data/emotes/available_emotes.json","load")
+        self.emote_url = "https://api.twitch.tv/kraken/chat/emoticons"
 
     def save_settings(self):
         fileIO("data/emotes/settings.json","save",self.settings)
+
+    def save_available_emotes(self):
+        fileIO("data/emotes/available_emotes.json","save",self.available_emotes)
+
+    def update_emote_list(self):
+        resp = requests.get(self.emote_url)
+        data = resp.json().get("emoticons",{})
+        #to_remove = (emote["chan_id"] for server in self.available_emotes for emote in self.available_emotes[server])
+        #self.emote_list = list(filter(lambda emote: emote.get("emoticon_set",-1) not in to_remove,data))
+        self.emote_list = data
 
     def _is_enabled(self,server):
         assert isinstance(server,discord.Server)
         if server.id not in self.settings:
             return False
-        if not self.settings.get(server.id,False):
+        if not self.settings[server.id]["ENABLED"]:
             return False
         return True
 
     @commands.group(pass_context=True)
-    @checks.mod_or_permission(manage_messages=True)
+    @checks.mod_or_permissions(manage_messages=True)
     async def emoteset(self,ctx):
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx):
+            await send_cmd_help(ctx)
             #TODO server-specific settings
 
     @emoteset.command(name="enabled",pass_context=True)
     async def _emoteset_enabled(self,ctx,setting : bool):
         server = ctx.message.server
         if server.id not in self.settings:
-            self.settings[server.id] = {}
+            self.settings[server.id] = []
         self.settings[server.id]["ENABLED"] = bool(setting)
         self.save_settings()
+        if server.id not in self.available_emotes:
+            self.available_emotes[server.id] = []
+            self.save_available_emotes()
         if setting:
             await self.bot.reply("emotes are now enabled.")
         else:
@@ -48,8 +63,17 @@ class Emotes:
 
     def _write_image(self, chan_id, name, image_data):
         #Assume channel folder already exists
-        with open('data/emotes/{}/{}'.format(chan_id,name)) as f:
+        if os.path.exists('data/emotes/{}/{}'.format(chan_id,name)):
+            return
+        with open('data/emotes/{}/{}'.format(chan_id,name),'wb') as f:
             f.write(image_data)
+
+    async def _remove_all_emotes(self,server,chan_id,name=""):
+        assert isinstance(server,discord.Server)
+        if server.id not in self.available_emotes:
+            return
+        self.available_emotes[server.id] = [emote for emote in self.available_emotes[server.id] if emote["chan_id"] != chan_id or emote["name"] == name]
+        self.save_available_emotes()
 
     async def _add_emote(self,server,chan_id):
         assert isinstance(server,discord.Server)
@@ -58,8 +82,8 @@ class Emotes:
         if not os.path.exists("data/emotes/{}".format(chan_id)):
             os.makedirs("data/emotes/{}".format(chan_id))
         for emote in self.emote_list:
-            if chan_id == emote.get("emoticon_set",-1):
-                url = emote.get("url","")
+            if chan_id == emote["images"][0].get("emoticon_set",-1):
+                url = emote["images"][0].get("url","")
                 name = emote.get("regex","")
                 file_name = url.split('/')[-1]
                 if url == "" or name == "":
@@ -73,20 +97,21 @@ class Emotes:
                     print(e)
                     print(dir(e))
                     print("------")
-                        self._write_image(chan_id,file_name,image)
-                    if server.id not in self.available_emotes:
-                        self.available_emotes[server.id] = {}
-                    if name not in self.available_emotes[server.id]:
-                        self.available_emotes[server.id] = {
-                                                            "name":name,
-                                                            "file_name":file_name,
-                                                            "chan_id":chan_id
-                                                        }
+                    return
+                self._write_image(chan_id,file_name,image)
+                if server.id not in self.available_emotes:
+                    self.available_emotes[server.id] = {}
+                self.available_emotes[server.id].append({
+                                                    "name":name,
+                                                    "file_name":file_name,
+                                                    "chan_id":chan_id
+                                                })
+                self.save_available_emotes()
 
     @commands.command(pass_context=True)
     async def emote(self,ctx,emote_name:str):
         server = ctx.message.server
-        if not self._is_enabled(server.id):
+        if not self._is_enabled(server):
             await self.bot.say("Emotes are not enabled on this server.")
             return
         server_emotes = self.available_emotes[server.id]
@@ -95,19 +120,30 @@ class Emotes:
             return
         for emote in self.emote_list:
             if emote_name == emote.get("regex",""):
-                chan_id = emote.get("emoticon_set",-1)
+                chan_id = emote["images"][0].get("emoticon_set",-1)
                 if chan_id == -1:
                     await self.bot.say("Yeah, something failed, try again later?")
                     return
-                await self._add_emotes(server,chan_id)
-                await self.bot.say("'{}' and other channel emotes added.")
+                await self._add_emote(server,chan_id)
+                await self.bot.say("'{}' and other channel emotes added.".format(emote_name))
                 return
 
     async def check_messages(self, message):
-        if message.server.id not in self.settings:
+        if message.author.id == self.bot.user.id:
             return
         if not self._is_enabled(message.server):
             return
+
+        valid_emotes = self.available_emotes[message.server.id]
+
+        for word in message.content.split(' '):
+            for emote in valid_emotes:
+                if word == emote.get("name",""):
+                    fname = 'data/emotes/{}/{}'.format(emote["chan_id"],emote["file_name"])
+                    if not os.path.exists(fname):
+                        await self._add_emote(chan_id)
+                    await self.bot.send_file(message.channel,fname)
+                    break
 
 def check_folders():
     if not os.path.exists("data/emotes"):
