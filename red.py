@@ -62,11 +62,11 @@ async def on_message(message):
     if user_allowed(message):
         if message.channel.is_private:
             has_prefix = False
-            for prefix in settings["PREFIXES"]:
+            for prefix in settings.prefixes:
                 if message.content.startswith(prefix):
                     has_prefix = True
             if not has_prefix:
-                message.content = settings["PREFIXES"][0]+message.content
+                message.content = settings.prefixes[0]+message.content
         await bot.process_commands(message)
 
 @bot.event
