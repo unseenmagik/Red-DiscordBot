@@ -24,14 +24,19 @@ class Emotes:
     def save_available_emotes(self):
         fileIO("data/emotes/available_emotes.json","save",self.available_emotes)
 
-    @property
-    def limit_per_message(self):
-        return self.settings.get("LIMIT_PER_MESSAGE",5)
+    def get_limit_per_message(self,server):
+        if server is None:
+            return 5
+        if not self._is_enabled(server):
+            return 5
+        return self.settings[server.id].get("LIMIT_PER_MESSAGE",5)
 
-    @limit_per_message.setter
-    def limit_per_message(self,value):
-        self.settings["LIMIT_PER_MESSAGE"] = int(value)
-        self.save_settings()
+    def set_limit_per_message(self,server,value):
+        if server is None:
+            return
+        if self._is_enabled(server):
+            self.settings[server.id]["LIMIT_PER_MESSAGE"] = int(value)
+            self.save_settings()
 
     def update_emote_list(self):
         resp = requests.get(self.emote_url)
@@ -48,7 +53,7 @@ class Emotes:
             return False
         return True
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True,no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
     async def emoteset(self,ctx):
         if ctx.invoked_subcommand is None:
@@ -74,7 +79,7 @@ class Emotes:
     async def _emoteset_limit(self,ctx,limit : int):
         """Emote limit per message."""
         if limit < 0: await send_cmd_help(ctx)
-        self.limit_per_message = limit
+        self.set_limit_per_message(ctx.message.server,limit)
         await self.bot.say("Limit set to {}.".format(limit))
 
     def _write_image(self, chan_id, name, image_data):
@@ -186,7 +191,7 @@ def check_files():
     f = "data/emotes/settings.json"
     if not fileIO(f, "check"):
         print("Creating empty settings.json...")
-        fileIO(f, "save", {"LIMIT_PER_MESSAGE":5})
+        fileIO(f, "save", {})
 
     f = "data/emotes/available_emotes.json"
     if not fileIO(f, "check"):
