@@ -50,7 +50,7 @@ class Emotes:
     async def _emoteset_enabled(self,ctx,setting : bool):
         server = ctx.message.server
         if server.id not in self.settings:
-            self.settings[server.id] = []
+            self.settings[server.id] = {}
         self.settings[server.id]["ENABLED"] = bool(setting)
         self.save_settings()
         if server.id not in self.available_emotes:
@@ -130,6 +130,8 @@ class Emotes:
 
     async def check_messages(self, message):
         if message.author.id == self.bot.user.id:
+            return
+        if message.channel.is_private:
             return
         if not self._is_enabled(message.server):
             return
