@@ -79,6 +79,7 @@ class Emotes:
             return
         if not os.path.exists("data/emotes/{}".format(chan_id)):
             os.makedirs("data/emotes/{}".format(chan_id))
+        await self._remove_all_emotes(server,chan_id)
         for emote in self.emote_list:
             if chan_id == emote["images"][0].get("emoticon_set",-1):
                 url = emote["images"][0].get("url","")
