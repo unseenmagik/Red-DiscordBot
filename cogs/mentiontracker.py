@@ -86,10 +86,13 @@ class MentionTracker:
         ret += "\tMessage:\n{}".format(message)
         return box(ret)
 
-    def _add_mail(self,add_id,message):
+    async def _add_mail(self,add_id,message):
         mail = {}
         mail["author"] = message.author.name
-        mail["message"] = self._clean_message(message)
+        message_to_store = ""
+        async for x in self.bot.logs_from(message.channel, limit=3, before=message):
+            message_to_store+=self._clean_message(x)+"\n"
+        mail["message"] = message_to_store+self._clean_message(message)
         mail["server"] = message.server.name
         mail["channel"] = message.channel.name
         mail["time"] = str(message.timestamp)
@@ -119,14 +122,12 @@ class MentionTracker:
                 limit = self.settings.get("MENTION_TIME_LIMIT",0)
                 delta = datetime.timedelta(minutes=limit)
                 if self._last_time(mention) + delta < datetime.datetime.utcnow():
-                    self._add_mail(mention.id,message)
+                    await self._add_mail(mention.id,message)
 
     async def user_update(self,before,after):
         if before.id in self.mail and len(self.mail[before.id]) > 0:
-            print("user update")
-            print("before: {}\nafter: {}".format(before.status==Status.online,after.status==Status.online))
             if before.status != Status.online and after.status == Status.online:
-                self.bot.send_message(after,"You have mail!\n\nExecute {} to view.".format(inline("mention read")))
+                await self.bot.send_message(after,"You have mail!\n\nType {} to view.".format(inline("mention read")))
 
 def check_folder():
     if not os.path.exists("data/mentiontracker"):
