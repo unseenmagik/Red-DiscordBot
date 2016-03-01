@@ -5,11 +5,11 @@ from .utils import checks
 from __main__ import send_cmd_help
 import os
 
-class RepTracker:
+class Karma:
     """Keep track of user scores through @mention++/--"""
     def __init__(self,bot):
         self.bot = bot
-        self.scores = fileIO("data/reptracker/scores.json", "load")
+        self.scores = fileIO("data/karma/scores.json", "load")
 
     def _process_scores(self,member_id,score_to_add):
         if member_id in self.scores:
@@ -44,10 +44,10 @@ class RepTracker:
         return ret+"```"
 
     @commands.command(pass_context=True)
-    async def rep(self,ctx):
-        """Checks a user's rep, requires @ mention 
+    async def karma(self,ctx):
+        """Checks a user's karma, requires @ mention 
 
-           Example: !rep @Red"""
+           Example: !karma @Red"""
         if len(ctx.message.mentions) != 1:
             await send_cmd_help(ctx)
             return
@@ -59,7 +59,7 @@ class RepTracker:
             if reasons: 
                 await self.bot.send_message(ctx.message.author,reasons)
         else:
-            await self.bot.say(member.name+" has no rep!")
+            await self.bot.say(member.name+" has no karma!")
 
     async def check_for_score(self,message):
         user = message.author
@@ -90,29 +90,29 @@ class RepTracker:
                 elif "--" in first_word.lower():
                     self._process_scores(member.id,-1)
                     self._add_reason(member.id,reason)
-                fileIO("data/reptracker/scores.json", "save", self.scores)
+                fileIO("data/karma/scores.json", "save", self.scores)
                 return
 
         if "++" in first_word or "--" in first_word:
             if "@" not in first_word:
-                await self.bot.send_message(message.channel,"You need to use an @ mention for score tracking.")
+                await self.bot.send_message(message.channel,"You need to use an @ mention for karma tracking.")
 
 def check_folder():
-    if not os.path.exists("data/reptracker"):
-        print("Creating data/reptracker folder...")
-        os.makedirs("data/reptracker")
+    if not os.path.exists("data/karma"):
+        print("Creating data/karma folder...")
+        os.makedirs("data/karma")
 
 def check_file():
     scores = {}
 
-    f = "data/reptracker/scores.json"
+    f = "data/karma/scores.json"
     if not fileIO(f, "check"):
-        print("Creating default reptracker's scores.json...")
+        print("Creating default karma's scores.json...")
         fileIO(f, "save", scores)
 
 def setup(bot):
     check_folder()
     check_file()
-    n = RepTracker(bot)
+    n = Karma(bot)
     bot.add_listener(n.check_for_score, "on_message")
     bot.add_cog(n)
