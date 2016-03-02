@@ -113,8 +113,7 @@ async def unload(*, module : str):
     """Unloads a module
 
     Example: unload cogs.mod"""
-    module = module.strip()
-    if not module in list_cogs():
+    if module not in bot.extensions:
         await bot.say("That module doesn't exist.")
         return
     set_cog(module, False)
