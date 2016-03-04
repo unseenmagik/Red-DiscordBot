@@ -295,8 +295,10 @@ def user_allowed(message):
         if not message.channel.is_private:
             server = message.server
             names = (settings.get_server_admin(server),settings.get_server_mod(server))
-            if None not in map(lambda name: discord.utils.get(author.roles,name=name),names):
-                return True
+            results = map(lambda name: discord.utils.get(author.roles,name=name),names)
+            for r in results:
+                if r != None:
+                    return True
 
         if author.id in mod.blacklist_list:
             return False
@@ -373,8 +375,8 @@ def check_configs():
         print("\nInput *your own* ID. You can type \@Yourname in chat to see it (copy only the numbers).")
         print("If you want, you can also do it later with [prefix]set owner. Leave empty in that case.")
         settings.owner = input("\nID> ")
-        if settings.owner == "": settings["OWNER"] = "id_here"
-        if not settings.owner.isdigit() and settings["OWNER"] != "id_here":
+        if settings.owner == "": settings.owner = "id_here"
+        if not settings.owner.isdigit() and settings.owner != "id_here":
             print("\nERROR: What you entered is not a valid ID. Set yourself as owner later with [prefix]set owner")
             settings.owner = "id_here"
 
