@@ -13,6 +13,7 @@ import sys
 import logging
 import traceback
 import aiohttp
+import inspect
 
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
