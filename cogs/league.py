@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands
 import aiohttp
 import asyncio
-from .utils import checks
-from .utils.dataIO import fileIO
+from cogs.utils import checks
+from cogs.utils.dataIO import fileIO
 from bs4 import BeautifulSoup
 import logging
 import random

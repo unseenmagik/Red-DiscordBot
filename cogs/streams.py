@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from .utils.dataIO import fileIO
-from .utils import checks
+from cogs.utils.dataIO import fileIO
+from cogs.utils import checks
 import os
 import time
 import aiohttp

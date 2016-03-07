@@ -1,0 +1,13 @@
+#: runescape.py:13
+#, docstring
+msgid "Runescape stuff"
+msgstr ""
+
+#: runescape.py:119
+#, docstring
+msgid "Gets a users recent adventure log"
+msgstr ""
+
+#: runescape.py:130
+msgid "No user found."
+msgstr ""

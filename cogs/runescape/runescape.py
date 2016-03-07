@@ -1,8 +1,10 @@
 import discord
 from discord.ext import commands
 import aiohttp
-from .utils.dataIO import fileIO
-from .utils.chat_formatting import *
+from cogs.utils.dataIO import fileIO
+from cogs.utils.chat_formatting import *
+from i18n import PluginInternationalization, internationalizeDocstring
+_ = PluginInternationalization('runescape')
 
 try:
     import feedparser
@@ -112,6 +114,7 @@ class Runescape:
         return ret
 
     @commands.command(no_pm=True)
+    @internationalizeDocstring
     async def alog(self,*, username):
         """Gets a users recent adventure log"""
         username = username.replace(" ","_")
@@ -124,7 +127,7 @@ class Runescape:
             text = await page.text()
             text = text.replace("\r","")
         except:
-            await self.bot.say("No user found.")
+            await self.bot.say(_("No user found."))
         
         feed = feedparser.parse(text)
         titles = [post.title for post in feed.entries]

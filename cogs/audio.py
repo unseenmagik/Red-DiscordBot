@@ -5,8 +5,8 @@ import threading
 import os
 from random import choice as rndchoice
 from random import shuffle
-from .utils.dataIO import fileIO
-from .utils import checks
+from cogs.utils.dataIO import fileIO
+from cogs.utils import checks
 from __main__ import send_cmd_help
 from __main__ import settings as bot_settings
 import glob

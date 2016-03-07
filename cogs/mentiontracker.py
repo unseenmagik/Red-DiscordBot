@@ -2,10 +2,10 @@ import discord
 from discord.ext import commands
 from discord.enums import Status
 from discord.utils import find
-from .utils import checks
-from .utils.chat_formatting import *
-from .utils.dataIO import fileIO
-from .utils import checks
+from cogs.utils import checks
+from cogs.utils.chat_formatting import *
+from cogs.utils.dataIO import fileIO
+from cogs.utils import checks
 from __main__ import send_cmd_help
 import os
 import datetime

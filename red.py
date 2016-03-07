@@ -14,6 +14,7 @@ import logging
 import traceback
 import aiohttp
 import inspect
+import imp
 
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
@@ -89,19 +90,19 @@ async def send_cmd_help(ctx):
         for page in pages:
             await bot.send_message(ctx.message.channel, page)
 
-@bot.command()
-@checks.is_owner()
-async def load(*, module : str):
-    """Loads a module
-
-    Example: load cogs.mod"""
-    module = module.strip()
-    if not module in list_cogs():
+async def _load(name):
+    name = name.strip()
+    if name in bot.extensions:
+        await bot.say('That module has already been loaded.')
+        return
+    moduleInfo = find_cog(name)
+    if moduleInfo is None:
         await bot.say("That module doesn't exist.")
         return
-    set_cog(module, True)
+    set_cog(name, True)
     try:
-        bot.load_extension(module)
+        module = imp.load_module(name,*moduleInfo)
+        bot.load_extension(module.__name__)
     except Exception as e:
         traceback.print_exc()
         await bot.say('{}: {}'.format(type(e).__name__, e))
@@ -110,10 +111,13 @@ async def load(*, module : str):
 
 @bot.command()
 @checks.is_owner()
-async def unload(*, module : str):
-    """Unloads a module
+async def load(*, name : str):
+    """Loads a module
 
-    Example: unload cogs.mod"""
+    Example: load cogs.mod"""
+    await _load(name)
+
+async def _unload(module):
     if module not in bot.extensions:
         await bot.say("That module doesn't exist.")
         return
@@ -125,25 +129,22 @@ async def unload(*, module : str):
     else:
         await bot.say("Module disabled.")
 
+@bot.command()
+@checks.is_owner()
+async def unload(*, module : str):
+    """Unloads a module
+
+    Example: unload cogs.mod"""
+    await _unload(module)
+
 @bot.command(name="reload")
 @checks.is_owner()
 async def _reload(*, module : str):
     """Reloads a module
 
     Example: reload cogs.mod"""
-    module = module.strip()
-    if not module in list_cogs():
-        await bot.say("That module doesn't exist.")
-        return
-    set_cog(module, True)
-    try:
-        bot.unload_extension(module)
-        bot.load_extension(module)
-    except Exception as e:
-        await bot.say('\U0001f52b')
-        await bot.say('{}: {}'.format(type(e).__name__, e))
-    else:
-        await bot.say("Module reloaded.")
+    await _unload(module)
+    await _load(module)
 
 
 @bot.command(pass_context=True, hidden=True) # Modified function, originally made by Rapptz 
@@ -341,6 +342,13 @@ def list_cogs():
         clean.append("cogs." + c.split("\\")[1].replace(".py", ""))
     return clean
 
+def find_cog(module):
+    try:
+        ret = imp.find_module(module,['cogs'])
+    except:
+        ret = None
+    return ret
+
 def check_folders():
     folders = ("data", "data/red", "cogs", "cogs/utils")
     for folder in folders:
@@ -435,12 +443,37 @@ def load_cogs():
     with open('data/red/cogs.json', "r") as f:
         data = json.load(f)
     register = tuple(data.keys()) #known cogs
-    extensions = list_cogs()
 
-    if extensions: print("\nLoading cogs...\n")
-    
     failed = []
-    for extension in extensions:
+
+    for cogname in data:
+        try:
+            moduleInfo = find_cog(cogname)
+        except:
+            moduleInfo = None
+        if moduleInfo is None:
+            failed.append(cogname)
+            continue
+        try:
+            module = imp.load_module(cogname,*moduleInfo)
+            bot.load_extension(module.__name__)
+        except Exception as e:
+            print(e)
+            failed.append(cogname)
+
+    for fail in failed:
+        del data[fail]
+
+    if failed:
+        print("\nFailed to load: ", end="")
+        for m in failed:
+            print(m + " ", end="")
+        print("\n")
+        print("These will be set to not load automatically.")
+        with open('data/red/cogs.json', "w") as f:
+            f.write(json.dumps(data))
+    
+    '''for extension in extensions:
         if extension in register:
             if data[extension]:
                 try:
@@ -460,17 +493,7 @@ def load_cogs():
                         print(e)
                         failed.append(extension)
                 else:
-                    data[extension] = False
-
-    if extensions:
-        with open('data/red/cogs.json', "w") as f:
-            f.write(json.dumps(data))
-    
-    if failed:
-        print("\nFailed to load: ", end="")
-        for m in failed:
-            print(m + " ", end="")
-        print("\n")
+                    data[extension] = False'''
 
 def main():
     global settings
