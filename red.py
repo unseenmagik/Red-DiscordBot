@@ -255,7 +255,7 @@ async def join(ctx,invite_url : discord.Invite):
     """Joins new server"""
     author = ctx.message.author
     channel = ctx.message.channel
-    if author.id != settings.owner or not channel.is_private:
+    if author.id != settings.owner and not channel.is_private:
         return
     try:
         await bot.accept_invite(invite_url)
