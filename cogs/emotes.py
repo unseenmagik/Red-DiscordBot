@@ -56,12 +56,14 @@ class Emotes:
     @commands.group(pass_context=True,no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
     async def emoteset(self,ctx):
+        """Various emote settings"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
             #TODO server-specific settings
 
     @emoteset.command(name="enabled",pass_context=True)
     async def _emoteset_enabled(self,ctx,setting : bool):
+        """Bool to see if emotes are enabled on this server."""
         server = ctx.message.server
         if server.id not in self.settings:
             self.settings[server.id] = {}
@@ -131,6 +133,7 @@ class Emotes:
 
     @commands.command(pass_context=True)
     async def emote(self,ctx,emote_name:str):
+        """Enabled emote and all emotes from same twitch channel"""
         server = ctx.message.server
         if not self._is_enabled(server):
             await self.bot.say("Emotes are not enabled on this server.")
