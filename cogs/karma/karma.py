@@ -93,7 +93,7 @@ class Karma:
                 fileIO("data/karma/scores.json", "save", self.scores)
                 return
 
-        if "++" in first_word or "--" in first_word:
+        if "++" == first_word or "--" == first_word:
             if "@" not in first_word:
                 await self.bot.send_message(message.channel,"You need to use an @ mention for karma tracking.")
 
