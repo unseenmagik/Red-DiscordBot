@@ -1,9 +1,0 @@
-TODO
-- No table flipping
-- anti spam
-- filter (add regex)
-- URL blacklisting
-- slow chat
-- mod only chat
-- supy stuff
-- rss feeds
