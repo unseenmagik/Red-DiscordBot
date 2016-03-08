@@ -135,6 +135,7 @@ class Runescape:
         await self.bot.say(self._fmt_alog(username,titles))
 
     @commands.command(no_pm=True)
+    @internationalizeDocstring
     async def hs(self,*, username):
         """Gets hiscores info"""
         username = username.replace(" ","_")

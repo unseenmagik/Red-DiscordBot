@@ -11,3 +11,7 @@ msgstr "wow I'm an idiot"
 #: runescape.py:130
 msgid "No user found."
 msgstr "No hablas engles"
+
+#: runescape.py:130
+msgid "Gets hiscores info"
+msgstr "No pantalones por favor"

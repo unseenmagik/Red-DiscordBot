@@ -11,3 +11,7 @@ msgstr ""
 #: runescape.py:130
 msgid "No user found."
 msgstr ""
+
+#: runescape.py:139
+msgid "Gets hiscores info"
+msgstr ""
