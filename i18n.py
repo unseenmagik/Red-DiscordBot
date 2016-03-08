@@ -47,7 +47,7 @@ IN_MSGSTR = 4
 MSGID = 'msgid "'
 MSGSTR = 'msgstr "'
 
-currentLocale = 'es'
+currentLocale = 'en'
 
 class PluginNotFound(Exception):
     pass
