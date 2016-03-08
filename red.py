@@ -15,6 +15,7 @@ import traceback
 import aiohttp
 import inspect
 import imp
+import datetime
 
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
@@ -260,6 +261,7 @@ async def join(ctx,invite_url : discord.Invite):
     try:
         await bot.accept_invite(invite_url)
         await bot.say("Server joined.")
+        print("{} had me join {} at {}".format(author,'something',datetime.datetime.now()))
     except discord.NotFound:
         await bot.say("The invite was invalid or expired.")
     except discord.HTTPException:
