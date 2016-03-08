@@ -98,12 +98,15 @@ def getPluginDir(plugin_name):
 def getLocalePath(name, localeName, extension):
     """Gets the path of the locale file of the given plugin ('supybot' stands
     for the core)."""
-    if name != 'supybot':
+    '''if name != 'supybot':
         base = getPluginDir(name)
     else:
         from . import ansi # Any Supybot plugin could fit
-        base = ansi.__file__[0:-len('ansi.pyc')]
-    directory = os.path.join(base, 'locales')
+        base = ansi.__file__[0:-len('ansi.pyc')]'''
+    base = 'cogs/locales'
+    if name.endswith('py'):
+        name = name[:-3]
+    directory = os.path.join(base, name)
     return '%s/%s.%s' % (directory, localeName, extension)
 
 i18nClasses = weakref.WeakValueDictionary()

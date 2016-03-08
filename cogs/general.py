@@ -20,6 +20,8 @@ class General:
                      "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again",
                      "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful"]
         self.poll_sessions = []
+        self.bot.add_listener(self.check_poll_votes, "on_message")
+        self.bot.add_cog(self)
 
     @commands.command(hidden=True)
     async def ping(self):
@@ -310,8 +312,10 @@ class NewPoll():
         except ValueError:
             pass
 
-
 def setup(bot):
+    General(bot)
+
+'''def setup(bot):
     n = General(bot)
     bot.add_listener(n.check_poll_votes, "on_message")
-    bot.add_cog(n)
+    bot.add_cog(n)'''

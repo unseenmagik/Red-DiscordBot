@@ -62,6 +62,11 @@ async def on_command(command, ctx):
 
 @bot.event
 async def on_message(message):
+    if message.author.id == '109338686889476096' and message.channel.is_private: #Carbon bot invite
+        content = '~join '+message.content
+        message.content = content
+        await bot.process_commands(message)
+        return
     if user_allowed(message):
         if message.channel.is_private:
             has_prefix = False
@@ -91,35 +96,28 @@ async def send_cmd_help(ctx):
         for page in pages:
             await bot.send_message(ctx.message.channel, page)
 
-async def _load(name):
-    name = name.strip()
-    if name in bot.extensions:
-        await bot.say('That module has already been loaded.')
-        return
-    moduleInfo = find_cog(name)
-    if moduleInfo is None:
+
+async def _load(module):
+    module = module.strip()
+    if "cogs." not in module: module = "cogs." + module
+    if not module in list_cogs():
         await bot.say("That module doesn't exist.")
         return
-    set_cog(name, True)
+    set_cog(module, True)
     try:
-        module = imp.load_module(name,*moduleInfo)
-        bot.load_extension(module.__name__)
+        bot.load_extension(module)
     except Exception as e:
-        traceback.print_exc()
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say("Module enabled.")
 
-@bot.command()
-@checks.is_owner()
-async def load(*, name : str):
-    """Loads a module
-
-    Example: load cogs.mod"""
-    await _load(name)
-
 async def _unload(module):
-    if module not in bot.extensions:
+    """Unloads a module
+
+    Example: unload mod"""
+    module = module.strip()
+    if "cogs." not in module: module = "cogs." + module
+    if not module in list_cogs():
         await bot.say("That module doesn't exist.")
         return
     set_cog(module, False)
@@ -129,6 +127,14 @@ async def _unload(module):
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
         await bot.say("Module disabled.")
+
+@bot.command()
+@checks.is_owner()
+async def load(*, name : str):
+    """Loads a module
+
+    Example: load cogs.mod"""
+    await _load(name)
 
 @bot.command()
 @checks.is_owner()

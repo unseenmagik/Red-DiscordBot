@@ -81,12 +81,6 @@ class RSS(object):
         self.settings = Settings()
         self.feeds = Feeds()
 
-        self.register_events()
-
-    def register_events(self):
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.read_feeds())
-
     def get_channel_object(self, channel_id):
         return self.bot.get_channel(channel_id)
 
@@ -159,4 +153,8 @@ class RSS(object):
                             self.feeds.update_time(server,name,curr_time)
             await asyncio.sleep(60)
 
-Class = RSS
+def setup(bot):
+    n = RSS(bot)
+    bot.add_cog(n)
+    loop = asyncio.get_event_loop()
+    loop.create_task(n.read_feeds())
