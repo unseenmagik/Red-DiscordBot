@@ -1,5 +1,9 @@
 import discord
+from discord.ext import commands
+
 import pylast
+import os
+
 from cogs.utils.dataIO import fileIO
 from __main__ import send_cmd_help
 
@@ -23,13 +27,11 @@ class Scrobbler(object):
         return net
 
     def check_settings(self):
-        ret = True
-        for k in self.settings:
-            if k == '':
-                print("Error: You need to set your {} in data/lastfm/settings.json")
-                ret = False
-                break
-        return ret
+        for k,v in self.settings.items():
+            if v == '':
+                print("Error: You need to set your {} in data/lastfm/settings.json".format(k))
+                return False
+        return True
 
     @commands.group(pass_context=True)
     async def lastfmset(self,ctx):
@@ -37,7 +39,7 @@ class Scrobbler(object):
             send_cmd_help(ctx)
 
 def check_folders():
-    if not os.exists('data/lastfm'):
+    if not os.path.exists('data/lastfm'):
         print('Creating data/lastfm folder.')
         os.mkdir('data/lastfm')
 
