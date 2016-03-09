@@ -198,7 +198,7 @@ class TriviaSession():
 
 async def get_trivia_by_channel(channel):
         for t in trivia_manager.trivia_sessions:
-            if t.channel == channel:
+            if t.channel == channel and t.status is not None and t.status != "stop":
                 return t
         return False
 
@@ -206,7 +206,11 @@ async def check_messages(message):
     if message.author.id != trivia_manager.bot.user.id:
         if await get_trivia_by_channel(message.channel):
             trvsession = await get_trivia_by_channel(message.channel)
-            await trvsession.check_answer(message)
+            try:
+                await trvsession.check_answer(message)
+            except:
+                trvsession.stop_trivia()
+                print('Killed broken trivia session.')
 
 def setup(bot):
     global trivia_manager
