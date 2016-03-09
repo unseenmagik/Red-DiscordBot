@@ -14,7 +14,7 @@ import logging
 import traceback
 import aiohttp
 import inspect
-import imp
+import importlib
 import datetime
 
 #
@@ -55,6 +55,11 @@ async def on_ready():
     print(users + " users")
     print("\n{0} active cogs with {1} commands\n".format(str(len(bot.cogs)), str(len(bot.commands))))
     bot.uptime = int(time.perf_counter())
+
+@bot.event
+async def on_server_join(server):
+    default_chan = server.default_channel
+    print("Joined {}".format(server.name))
 
 @bot.event
 async def on_command(command, ctx):
@@ -105,7 +110,9 @@ async def _load(module):
         return
     set_cog(module, True)
     try:
-        bot.load_extension(module)
+        module = importlib.import_module(module)
+        importlib.reload(module)
+        bot.load_extension(module.__name__)
     except Exception as e:
         await bot.say('{}: {}'.format(type(e).__name__, e))
     else:
@@ -267,7 +274,6 @@ async def join(ctx,invite_url : discord.Invite):
     try:
         await bot.accept_invite(invite_url)
         await bot.say("Server joined.")
-        print("{} had me join {} at {}".format(author,'something',datetime.datetime.now()))
     except discord.NotFound:
         await bot.say("The invite was invalid or expired.")
     except discord.HTTPException:
@@ -349,13 +355,6 @@ def list_cogs():
         c = c.replace("/", "\\") # Linux fix
         clean.append("cogs." + c.split("\\")[1].replace(".py", ""))
     return clean
-
-def find_cog(module):
-    try:
-        ret = imp.find_module(module,['cogs'])
-    except:
-        ret = None
-    return ret
 
 def check_folders():
     folders = ("data", "data/red", "cogs", "cogs/utils")
@@ -451,37 +450,12 @@ def load_cogs():
     with open('data/red/cogs.json', "r") as f:
         data = json.load(f)
     register = tuple(data.keys()) #known cogs
+    extensions = list_cogs()
 
-    failed = []
-
-    for cogname in data:
-        try:
-            moduleInfo = find_cog(cogname)
-        except:
-            moduleInfo = None
-        if moduleInfo is None:
-            failed.append(cogname)
-            continue
-        try:
-            module = imp.load_module(cogname,*moduleInfo)
-            bot.load_extension(module.__name__)
-        except Exception as e:
-            print(e)
-            failed.append(cogname)
-
-    for fail in failed:
-        del data[fail]
-
-    if failed:
-        print("\nFailed to load: ", end="")
-        for m in failed:
-            print(m + " ", end="")
-        print("\n")
-        print("These will be set to not load automatically.")
-        with open('data/red/cogs.json', "w") as f:
-            f.write(json.dumps(data))
+    if extensions: print("\nLoading cogs...\n")
     
-    '''for extension in extensions:
+    failed = []
+    for extension in extensions:
         if extension in register:
             if data[extension]:
                 try:
@@ -501,7 +475,9 @@ def load_cogs():
                         print(e)
                         failed.append(extension)
                 else:
-                    data[extension] = False'''
+                    data[extension] = False
+    with open('data/red/cogs.json', "w") as f:
+        f.write(json.dumps(data))
 
 def main():
     global settings
