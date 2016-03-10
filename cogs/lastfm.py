@@ -39,10 +39,10 @@ class Scrobbler(object):
     @commands.group(pass_context=True)
     async def lastfmset(self,ctx):
         if ctx.invoked_subcommand is None:
-            send_cmd_help(ctx)
+            await send_cmd_help(ctx)
 
     @lastfmset.command(pass_context=True,name="enable")
-    async def _lastfmset_enabled(self):
+    async def _lastfmset_enabled(self,ctx):
         if 'ENABLED' not in self.settings:
             self.settings['ENABLED'] = True
             await self.bot.say('Scrobbler enabled.')
@@ -52,23 +52,31 @@ class Scrobbler(object):
             await self.bot.say('Scrobbler enabled? {}'.format((not curr)))
         fileIO('data/lastfm/settings.json','save',self.settings)
 
-    async def audio_loader(self):
-        while self.audio is None:
-            self.audio = self.bot.get_cog('Audio')
-            asyncio.sleep(5)
-
     async def audio_watcher(self):
-        if self.audio:
-            if self.audio.downloader["DONE"]:
-                if self.audio.downloader["TITLE"] != self.last_title \
-                        and self.audio.music_player.is_playing():
-                    self.last_title = self.audio.downloader["TITLE"]
-                    timestamp = int(time.time())
-                    self.network.scrobble(title=self.last_title,
-                                          timestamp=timestamp)
-            asyncio.sleep(120)
-        else:
-            asyncio.sleep(60)
+        await self.bot.wait_until_ready()
+        while 'Scrobbler' in self.bot.cogs:
+            self.audio = self.bot.get_cog('Audio')
+            if self.audio:
+                if self.audio.downloader["DONE"]:
+                    if self.audio.downloader["TITLE"] != self.last_title \
+                            and self.audio.music_player.is_playing():
+                        self.last_title = self.audio.downloader["TITLE"]
+                        title = self.last_title
+                        artist="Wish I knew"
+                        timestamp = int(time.time())
+                        try:
+                            splitted = self.last_title.split(' - ')
+                            title = splitted[1]
+                            artist = splitted[0]
+                        except:
+                            pass
+                        self.network.scrobble(title=title,
+                                              artist=artist,
+                                              timestamp=timestamp)
+                await asyncio.sleep(30)
+            else:
+                print('Audio not loaded!')
+                await asyncio.sleep(15)
 
 def check_folders():
     if not os.path.exists('data/lastfm'):
@@ -89,5 +97,4 @@ def setup(bot):
     n = Scrobbler(bot)
     bot.add_cog(n)
     loop = asyncio.get_event_loop()
-    loop.create_task(n.audio_loader())
-    loop.create_task(n.audio_checker())
+    loop.create_task(n.audio_watcher())
