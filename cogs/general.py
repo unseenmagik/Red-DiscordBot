@@ -6,6 +6,7 @@ import datetime
 import time
 import aiohttp
 import asyncio
+import re
 
 settings = {"POLL_DURATION" : 60}
 
@@ -40,15 +41,41 @@ class General:
             await self.bot.say(randchoice(choices))
 
     @commands.command()
-    async def roll(self, number : int = 100):
+    async def roll(self, *dice_string):
         """Rolls random number (between 1 and user choice)
-
         Defaults to 100.
+        OPtionally, the user can specify a d20 format such as XdY+Z
+        X refers to number of dice
+        Y refers to die size
+        Z refers to the modifier
         """
-        if number > 1:
-            return await self.bot.say(":game_die: " + str(randint(1, number)) + " :game_die:")
+        d20_pattern = "(\d+)d(\d+)\+*(\d+)?"
+        number_pattern ="(\d+)"
+
+        if dice_string:
+            d20 = re.split(d20_pattern, dice_string[0].replace(" ", ""))
+            normal = re.split(number_pattern, dice_string[0].replace(" ", ""))
+
+            if d20[0] == '' and d20[1]:
+                num_dice = abs(int(d20[1])) if abs(int(d20[1])) <= 10 else 10
+                die_size = abs(int(d20[2]))
+
+                if d20[3]:
+                    mod = int(d20[3])
+                else:
+                    mod = 0
+
+                for x in range(0, num_dice):
+                    result = str(randint(1, die_size) + mod)
+
+                    await self.bot.say(":game_die: " + result + " :game_die:")
+
+                return
+            elif normal[0] == '' and normal[1]:
+                return await self.bot.say(":game_die: " + str(randint(1, abs(int(normal[1])))) + " :game_die:")
+
         else:
-            return await self.bot.say("Maybe higher than 1? ;P")
+            return await self.bot.say(":game_die: " + str(randint(1, 100)) + " :game_die:")
 
     @commands.command(pass_context=True)
     async def flip(self, ctx, user : discord.Member=None):

@@ -29,8 +29,10 @@ class BotInfo:
         ret += inline(self.prefixes+"help")
         ret += "\n\n"
         ret += italics("If you want a custom plugin made: ")
-        ret += inline("~pluginidea [desc]")
-        ret += " and it will be sent to my owner."
+        ret += inline("~contact [desc]")
+        ret += " and it will be sent to my owner.\n"
+        ret += "I can also do " + bold('Twitch Emotes')+ "!\n"
+        ret += "See "+inline(self.prefixes+"help Emotes")
         return ret
 
     @commands.command()
