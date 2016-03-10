@@ -3,6 +3,8 @@ from discord.ext import commands
 
 import pylast
 import os
+import asyncio
+import time
 
 from cogs.utils.dataIO import fileIO
 from __main__ import send_cmd_help
@@ -16,6 +18,7 @@ class Scrobbler(object):
             raise RuntimeError("You need to set your lastfm settings.")
         self.network = self.setup_network()
         self.audio = None
+        self.last_title = ""
 
     def setup_network(self):
         api_key = self.settings.get('APIKEY')
@@ -38,6 +41,35 @@ class Scrobbler(object):
         if ctx.invoked_subcommand is None:
             send_cmd_help(ctx)
 
+    @lastfmset.command(pass_context=True,name="enable")
+    async def _lastfmset_enabled(self):
+        if 'ENABLED' not in self.settings:
+            self.settings['ENABLED'] = True
+            await self.bot.say('Scrobbler enabled.')
+        else:
+            curr = self.setting['ENABLED']
+            self.setting['ENABLED'] = (not curr)
+            await self.bot.say('Scrobbler enabled? {}'.format((not curr)))
+        fileIO('data/lastfm/settings.json','save',self.settings)
+
+    async def audio_loader(self):
+        while self.audio is None:
+            self.audio = self.bot.get_cog('Audio')
+            asyncio.sleep(5)
+
+    async def audio_watcher(self):
+        if self.audio:
+            if self.audio.downloader["DONE"]:
+                if self.audio.downloader["TITLE"] != self.last_title \
+                        and self.audio.music_player.is_playing():
+                    self.last_title = self.audio.downloader["TITLE"]
+                    timestamp = int(time.time())
+                    self.network.scrobble(title=self.last_title,
+                                          timestamp=timestamp)
+            asyncio.sleep(120)
+        else:
+            asyncio.sleep(60)
+
 def check_folders():
     if not os.path.exists('data/lastfm'):
         print('Creating data/lastfm folder.')
@@ -56,3 +88,6 @@ def setup(bot):
     check_files()
     n = Scrobbler(bot)
     bot.add_cog(n)
+    loop = asyncio.get_event_loop()
+    loop.create_task(n.audio_loader())
+    loop.create_task(n.audio_checker())
