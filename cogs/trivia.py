@@ -209,7 +209,7 @@ async def check_messages(message):
             try:
                 await trvsession.check_answer(message)
             except:
-                trvsession.stop_trivia()
+                await trvsession.stop_trivia()
                 print('Killed broken trivia session.')
 
 def setup(bot):
