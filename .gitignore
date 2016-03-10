@@ -7,3 +7,4 @@ data
 *.exe
 *.dll
 tests
+cogs/errand.py
