@@ -65,7 +65,7 @@ class Feeds(object):
         self.feeds[server][channel] = {}
         self.feeds[server][channel][name] = {}
         self.feeds[server][channel][name]['url'] = url
-        self.feeds[server][channel][name]['last'] = ()
+        self.feeds[server][channel][name]['last'] = ""
         self.feeds[server][channel][name]['template'] = "$name:\n$title"
         self.save_feeds()
 
@@ -157,15 +157,14 @@ class RSS(object):
                 for chan_id in feeds[server]:
                     for name,items in feeds[server][chan_id].items():
                         url = items['url']
-                        last_time = items['last']
+                        last_title = items['last']
                         template = items['template']
                         text = await self._get_feed(url)
                         rss = feedparser.parse(text)
                         if rss.bozo:
                             continue
-                        curr_time = rss.entries[0].published_parsed[:5]
-                        curr_datetime = datetime.datetime(*curr_time)
-                        if len(last_time) == 0 or curr_datetime > datetime.datetime(*last_time):
+                        curr_title = rss.entries[0].title
+                        if last_title == "" or curr_title != last_title:
                             channel = self.get_channel_object(chan_id)
                             latest = rss.entries[0]
                             to_fill = string.Template(template)
@@ -173,7 +172,7 @@ class RSS(object):
                                 name=bold(name),
                                 **latest
                             )
-                            self.feeds.update_time(server,chan_id,name,curr_time)
+                            self.feeds.update_time(server,chan_id,name,curr_title)
                             await self.bot.send_message(channel,message)
             await asyncio.sleep(60)
 
