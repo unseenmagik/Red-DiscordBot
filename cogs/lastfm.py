@@ -96,5 +96,4 @@ def setup(bot):
     check_files()
     n = Scrobbler(bot)
     bot.add_cog(n)
-    loop = asyncio.get_event_loop()
-    loop.create_task(n.audio_watcher())
+    bot.loop.create_task(n.audio_watcher())

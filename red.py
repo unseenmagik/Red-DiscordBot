@@ -80,7 +80,17 @@ async def on_message(message):
                     has_prefix = True
             if not has_prefix:
                 message.content = settings.prefixes[0]+message.content
-        await bot.process_commands(message)
+        try:
+            await bot.process_commands(message)
+        except discord.errors.HTTPException:
+            bot.send_message(message.channel, ("Something went wrong with ",
+                                               "my connection to Discord's ",
+                                               "servers. Please try that ",
+                                               "command again."))
+            print(datetime.datetime.now(), "HTTPException")
+        except:
+            print(message.server.name, message.author.name, message.content)
+            raise
 
 @bot.event
 async def on_command_error(error, ctx):

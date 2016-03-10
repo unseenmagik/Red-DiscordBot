@@ -174,10 +174,9 @@ class RSS(object):
                             )
                             self.feeds.update_time(server,chan_id,name,curr_title)
                             await self.bot.send_message(channel,message)
-            await asyncio.sleep(60)
+            await asyncio.sleep(300)
 
 def setup(bot):
     n = RSS(bot)
     bot.add_cog(n)
-    loop = asyncio.get_event_loop()
-    loop.create_task(n.read_feeds())
+    bot.loop.create_task(n.read_feeds())

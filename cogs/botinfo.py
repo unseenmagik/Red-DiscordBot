@@ -28,7 +28,7 @@ class BotInfo:
         ret += " and you can see all of my commands by running "
         ret += inline(self.prefixes+"help")
         ret += "\n\n"
-        ret += italics("If you want a custom plugin made: ")
+        ret += italics("If you want a custom plugin made:") + " "
         ret += inline("~contact [desc]")
         ret += " and it will be sent to my owner.\n"
         ret += "I can also do " + bold('Twitch Emotes')+ "!\n"
