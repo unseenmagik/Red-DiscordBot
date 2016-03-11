@@ -27,7 +27,7 @@ import datetime
 #
 
 description = """
-Red - A multifunction Discord bot by Twentysix
+Squid - A multifunction Discord bot by Will (forked from Twentysix26)
 """
 
 formatter = commands.HelpFormatter(show_check_failure=False)
@@ -502,14 +502,13 @@ def main():
     yield from bot.connect()
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
     try:
-        loop.run_until_complete(main())
+        bot.loop.run_until_complete(main())
     except discord.LoginFailure:
         print("Invalid login credentials. Restart Red and configure it properly.")
         os.remove('data/red/settings.json') # Hopefully this won't backfire in case of discord servers' problems
     except Exception as e:
         print(e)
-        loop.run_until_complete(bot.logout())
+        bot.loop.run_until_complete(bot.logout())
     finally:
-        loop.close()
+        bot.loop.close()
