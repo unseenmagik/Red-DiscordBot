@@ -69,10 +69,10 @@ class MentionTracker:
             temp_context.invoked_subcommand = self._mention_register
             await send_cmd_help(temp_context)
             return
-        if len(self.mail[user.id]) == 0:
+        if len(self.mail[user.id]['mail']) == 0:
             await self.bot.say("You have no mentions.")
             return
-        for mail in self.mail[user.id]:
+        for mail in self.mail[user.id]['mail']:
             await self.bot.whisper(self._fmt_mail(mail))
         self.mail[user.id]['mail'] = []
         self.mail[user.id]['last_notify'] = 0
