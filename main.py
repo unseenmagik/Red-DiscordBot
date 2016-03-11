@@ -17,6 +17,8 @@ import inspect
 import importlib
 import datetime
 
+import red.registry as registry
+
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
 #                   https://github.com/Twentysix26/
@@ -36,6 +38,24 @@ bot = commands.Bot(command_prefix=["_"], formatter=formatter,
                    description=description, pm_help=None)
 
 settings = Settings()
+
+registryFilename = "data/red/Red.conf"
+'''try:
+    registry.open_registry(registryFilename)
+except registry.InvalidRegistryValue as e:
+    s = '%s in %s.  Please fix this error and start supybot again.' % \
+        (e, registryFilename)
+    s = textwrap.fill(s)
+    sys.stderr.write(s)
+    sys.stderr.write(os.linesep)
+    raise
+    sys.exit(-1)
+except EnvironmentError as e:
+    sys.stderr.write(str(e))
+    sys.stderr.write(os.linesep)
+    sys.exit(-1)
+
+import red.conf as conf'''
 
 from cogs.utils import checks
 
@@ -91,6 +111,8 @@ async def on_message(message):
         except:
             print(message.server.name, message.author.name, message.content)
             raise
+    else:
+        raise commands.CheckFailure()
 
 @bot.event
 async def on_command_error(error, ctx):
