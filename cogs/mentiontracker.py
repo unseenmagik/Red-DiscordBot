@@ -10,6 +10,7 @@ from __main__ import send_cmd_help
 import os
 import datetime
 import asyncio
+import time
 
 class MentionTracker:
     def __init__(self,bot):
@@ -50,7 +51,9 @@ class MentionTracker:
         """Register yourself for mention tracking"""
         user = ctx.message.author
         if user.id not in self.mail:
-            self.mail[user.id] = []
+            self.mail[user.id] = {}
+            self.mail[user.id]['mail'] = []
+            self.mail[user.id]['last_notify'] = 0
             fileIO("data/mentiontracker/mail.json","save",self.mail)
             await self.bot.reply("thanks for registering.")
         else:
@@ -71,7 +74,8 @@ class MentionTracker:
             return
         for mail in self.mail[user.id]:
             await self.bot.whisper(self._fmt_mail(mail))
-        self.mail[user.id] = []
+        self.mail[user.id]['mail'] = []
+        self.mail[user.id]['last_notify'] = 0
         fileIO("data/mentiontracker/mail.json","save",self.mail)
 
     def _fmt_mail(self,mail):
@@ -96,7 +100,7 @@ class MentionTracker:
         mail["server"] = message.server.name
         mail["channel"] = message.channel.name
         mail["time"] = str(message.timestamp)
-        self.mail[add_id].append(mail)
+        self.mail[add_id]['mail'].append(mail)
         fileIO("data/mentiontracker/mail.json","save",self.mail)
 
     def _clean_message(self,message):
@@ -127,7 +131,12 @@ class MentionTracker:
     async def user_update(self,before,after):
         if before.id in self.mail and len(self.mail[before.id]) > 0:
             if before.status != Status.online and after.status == Status.online:
-                await self.bot.send_message(after,"You have mail!\n\nType {} to view.".format(inline("mention read")))
+                if self.mail[after.id]['last_notify'] + 300 < int(time.time()):
+                    await self.bot.send_message(
+                        after,"You have mail!\n\nType {} to view.".format(inline("mention read"))
+                    )
+                    self.mail[after.id]['last_notify'] = int(time.time())
+                    fileIO("data/mentiontracker/mail.json","save",self.mail)
 
 def check_folder():
     if not os.path.exists("data/mentiontracker"):
