@@ -129,7 +129,7 @@ class MentionTracker:
                     await self._add_mail(mention.id,message)
 
     async def user_update(self,before,after):
-        if before.id in self.mail and len(self.mail[before.id]) > 0:
+        if before.id in self.mail and len(self.mail[before.id]['mail']) > 0:
             if before.status != Status.online and after.status == Status.online:
                 if self.mail[after.id]['last_notify'] + 300 < int(time.time()):
                     await self.bot.send_message(
