@@ -112,7 +112,7 @@ class MentionTracker:
     def _last_time(self,mention):
         mail = self.mail[mention.id]['mail']
         if len(mail) > 0:
-            last_mention = mail['mail'][-1]
+            last_mention = mail[-1]
             return datetime.datetime.strptime(last_mention["time"],"%Y-%m-%d %H:%M:%S.%f")
         else:
             return datetime.datetime.min
