@@ -18,6 +18,7 @@ import importlib
 import datetime
 
 import red.registry as registry
+from red.bot import Bot, Ignoring
 
 #
 #  Red, a Discord bot by Twentysix, based on discord.py and its command extension
@@ -36,7 +37,6 @@ formatter = commands.HelpFormatter(show_check_failure=False)
 
 bot = commands.Bot(command_prefix=["_"], formatter=formatter,
                    description=description, pm_help=None)
-
 settings = Settings()
 
 registryFilename = "data/red/Red.conf"
@@ -75,15 +75,17 @@ async def on_ready():
     print(users + " users")
     print("\n{0} active cogs with {1} commands\n".format(str(len(bot.cogs)), str(len(bot.commands))))
     bot.uptime = int(time.perf_counter())
+    await bot.process_events()
 
 @bot.event
 async def on_server_join(server):
     default_chan = server.default_channel
     print("Joined {}".format(server.name))
+    await bot.process_events(server)
 
 @bot.event
 async def on_command(command, ctx):
-    pass
+    await bot.process_events(command, ctx)
 
 @bot.event
 async def on_message(message):
@@ -102,6 +104,7 @@ async def on_message(message):
                 message.content = settings.prefixes[0]+message.content
         try:
             await bot.process_commands(message)
+            await bot.process_events(message)
         except discord.errors.HTTPException:
             bot.send_message(message.channel, ("Something went wrong with ",
                                                "my connection to Discord's ",
@@ -111,8 +114,15 @@ async def on_message(message):
         except:
             print(message.server.name, message.author.name, message.content)
             raise
+
+'''@bot.event
+async def on_error(event,*args,**kwargs):
+    if event == 'on_message':
+        if issubclass(commands.EventIgnore,sys.exc_info()[0]):
+            pass
     else:
-        raise commands.CheckFailure()
+        print('Ignoring exception in {}'.format(event), file=sys.stderr)
+        traceback.print_exc()'''
 
 @bot.event
 async def on_command_error(error, ctx):
@@ -122,6 +132,7 @@ async def on_command_error(error, ctx):
         await send_cmd_help(ctx)
     elif isinstance(error, commands.CheckFailure):
         await bot.send_message(ctx.message.author,"You likely don't have permissions for that.")
+    await bot.process_events(error,ctx)
 
 async def send_cmd_help(ctx):
     if ctx.invoked_subcommand:
@@ -357,9 +368,11 @@ def user_allowed(message):
 
         if not message.channel.is_private:
             if message.server.id in mod.ignore_list["SERVERS"]:
+                #raise commands.EventIgnore
                 return False
 
             if message.channel.id in mod.ignore_list["CHANNELS"]:
+                #raise commands.EventIgnore
                 return False
         return True
     else:
@@ -532,5 +545,13 @@ if __name__ == '__main__':
     except Exception as e:
         print(e)
         bot.loop.run_until_complete(bot.logout())
+        pending = asyncio.Task.all_tasks()
+        gathered = asyncio.gather(*pending)
+        try:
+            gathered.cancel()
+            bot.loop.run_forever()
+            gathered.exception()
+        except:
+            pass
     finally:
         bot.loop.close()

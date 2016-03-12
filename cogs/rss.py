@@ -159,12 +159,11 @@ class RSS(object):
                         url = items['url']
                         last_title = items['last']
                         template = items['template']
-                        text = await self._get_feed(url)
-                        rss = feedparser.parse(text)
+                        rss = feedparser.parse(url)
                         if rss.bozo:
                             continue
                         curr_title = rss.entries[0].title
-                        if last_title == "" or curr_title != last_title:
+                        if curr_title != last_title:
                             channel = self.get_channel_object(chan_id)
                             latest = rss.entries[0]
                             to_fill = string.Template(template)

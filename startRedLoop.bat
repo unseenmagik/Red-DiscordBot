@@ -2,7 +2,7 @@
 chcp 65001
 :Start
 
-python red.py
+python main.py
 timeout 3
 
 goto Start
