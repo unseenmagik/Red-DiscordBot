@@ -3,13 +3,20 @@ from discord.ext import commands
 from discord import utils
 from cogs.utils.dataIO import fileIO
 from cogs.utils.chat_formatting import *
-from __main__ import settings
+from __main__ import settings, send_cmd_help
+import os
+import re
+import string
 
 import datetime
 
 class BotInfo:
     def __init__(self,bot):
         self.bot = bot
+        self.welcome_messages = fileIO("data/botinfo/welcome.json","load")
+
+    def save_welcome(self):
+        fileIO("data/botinfo/welcome.json","save",self.welcome_messages)
 
     @property
     def prefixes(self):
@@ -17,7 +24,6 @@ class BotInfo:
         middle = "|".join(self.bot.command_prefix)
         return ret+middle+"]"'''
         return self.bot.command_prefix[0]
-    
 
     @property
     def join_message(self):
@@ -59,6 +65,33 @@ class BotInfo:
         else:
             await self.bot.say("Sorry, my owner is offline, try again later?")
 
+    @commands.group(pass_context=True)
+    async def welcome(self,ctx):
+        if not ctx.invoked_subcommand:
+            await send_cmd_help(ctx)
+
+    @welcome.command(name="set",pass_context=True)
+    async def _welcome_set(self, ctx, *, message):
+        """You can use $user to name the member who joins"""
+        server = ctx.message.server.id
+        channel_mentions = ctx.message.channel_mentions
+        if server not in self.welcome_messages:
+            self.welcome_messages[server] = {}
+        if len(channel_mentions) == 0:
+            channel = ctx.message.server.default_channel
+        else:
+            poss_mention = message.split(" ")[0]
+            if not re.compile(r'<#([0-9]+)>').match(poss_mention):
+                channel = ctx.message.server.default_channel
+            else:
+                channel = utils.get(channel_mentions,mention=poss_mention)
+                message = message[len(channel.mention)+1:] #for the space
+        
+        self.welcome_messages[server][channel.id] = message
+        fileIO("data/botinfo/welcome.json","save",self.welcome_messages)
+
+        await self.bot.say('Member join message on {} set to:\n\n{}'.format(channel.mention,message))
+
     async def serverjoin(self,server):
         channel = server.default_channel
         print('Joined {} at {}'.format(server.name,datetime.datetime.now()))
@@ -67,7 +100,36 @@ class BotInfo:
         except discord.errors.Forbidden:
             pass
 
+    async def memberjoin(self,member):
+        server = member.server
+        welcome = self.welcome_messages.copy()
+        if server.id in welcome:
+            for chan_id in welcome[server.id]:
+                channel = server.get_channel(chan_id)
+                if channel is None:
+                    del self.welcome_messages[server.id][chan_id]
+                    self.save_welcome()
+                    continue
+                template = welcome[server.id][chan_id]
+                message = string.Template(template)
+                message = message.safe_substitute(user=member.mention)
+                await self.bot.send_message(channel,message)
+
+def check_folders():
+    if not os.path.exists("data/botinfo"):
+        print("Creating default mentiontracker's welcome.json")
+        os.mkdir("data/botinfo")
+
+def check_files():
+    f = "data/botinfo/welcome.json"
+    if not fileIO(f, "check"):
+        print("Creating default botinfo's welcome.json...")
+        fileIO(f, "save", {})
+
 def setup(bot):
+    check_folders()
+    check_files()
     n = BotInfo(bot)
     bot.add_listener(n.serverjoin, "on_server_join")
+    bot.add_listener(n.memberjoin, "on_member_join")
     bot.add_cog(n)
