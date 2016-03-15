@@ -36,7 +36,8 @@ Squid - A multifunction Discord bot by Will (forked from Twentysix26)
 formatter = commands.HelpFormatter(show_check_failure=False)
 
 bot = commands.Bot(command_prefix=["_"], formatter=formatter,
-                   description=description, pm_help=None)
+                   description=description, pm_help=None,
+                   override_event_control=True)
 settings = Settings()
 
 registryFilename = "data/red/Red.conf"
