@@ -72,7 +72,7 @@ class BotInfo:
 
     @welcome.command(name="set",pass_context=True)
     async def _welcome_set(self, ctx, *, message):
-        """You can use $user to name the member who joins"""
+        """You can use $user to mention the member who joins"""
         server = ctx.message.server.id
         channel_mentions = ctx.message.channel_mentions
         if server not in self.welcome_messages:
@@ -91,6 +91,21 @@ class BotInfo:
         fileIO("data/botinfo/welcome.json","save",self.welcome_messages)
 
         await self.bot.say('Member join message on {} set to:\n\n{}'.format(channel.mention,message))
+
+    @welcome.command(name="remove",pass_context=True)
+    async def _welcome_remove(self,ctx,channel):
+        server = ctx.message.server.id
+        channel_mentions = ctx.message.channel_mentions
+        if server not in self.welcome_messages:
+            return
+        channel = utils.get(channel_mentions,mention=channel)
+        if channel is None:
+            await self.bot.say('Invalid channel.')
+            return
+
+        if channel.id in self.welcome_messages[server]:
+            del self.welcome_messages[server][channel.id]
+            self.save_welcome()
 
     async def serverjoin(self,server):
         channel = server.default_channel
