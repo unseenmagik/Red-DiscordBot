@@ -95,7 +95,7 @@ class MentionTracker:
         mail["author"] = message.author.name
         message_to_store = ""
         async for x in self.bot.logs_from(message.channel, limit=3, before=message):
-            message_to_store+=self._clean_message(x)+"\n"
+            message_to_store+=x.author.name+": "+self._clean_message(x)+"\n"
         mail["message"] = message_to_store+self._clean_message(message)
         mail["server"] = message.server.name
         mail["channel"] = message.channel.name
@@ -132,10 +132,10 @@ class MentionTracker:
         if before.id in self.mail and len(self.mail[before.id]['mail']) > 0:
             if before.status != Status.online and after.status == Status.online:
                 if self.mail[after.id]['last_notify'] + 300 < int(time.time()):
+                    self.mail[after.id]['last_notify'] = int(time.time())
                     await self.bot.send_message(
                         after,"You have mail!\n\nType {} to view.".format(inline("mention read"))
                     )
-                    self.mail[after.id]['last_notify'] = int(time.time())
                     fileIO("data/mentiontracker/mail.json","save",self.mail)
 
 def check_folder():
