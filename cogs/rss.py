@@ -1,29 +1,27 @@
-import discord
 from discord.ext import commands
 import feedparser
 import os
-import time
 import aiohttp
 import asyncio
-import datetime
 import string
 
-import cogs.utils.checks as checks
 from cogs.utils.dataIO import fileIO
 from cogs.utils.chat_formatting import *
 from __main__ import send_cmd_help
 
+
 class Settings(object):
     pass
+
 
 class Feeds(object):
     def __init__(self):
         self.check_folders()
         # {server:{channel:{name:,url:,last_scraped:,template:}}}
-        self.feeds = fileIO("data/RSS/feeds.json","load")
+        self.feeds = fileIO("data/RSS/feeds.json", "load")
 
     def save_feeds(self):
-        fileIO("data/RSS/feeds.json","save",self.feeds)
+        fileIO("data/RSS/feeds.json", "save", self.feeds)
 
     def check_folders(self):
         if not os.path.exists("data/RSS"):
@@ -37,14 +35,14 @@ class Feeds(object):
             print("Creating empty feeds.json...")
             fileIO(f, "save", {})
 
-    def update_time(self,server,channel,name,time):
+    def update_time(self, server, channel, name, time):
         if server in self.feeds:
             if channel in self.feeds[server]:
                 if name in self.feeds[server][channel]:
                     self.feeds[server][channel][name]['last'] = time
                     self.save_feeds()
 
-    async def edit_template(self,ctx,name,template):
+    async def edit_template(self, ctx, name, template):
         server = ctx.message.server.id
         channel = ctx.message.channel.id
         if server not in self.feeds:
@@ -69,7 +67,7 @@ class Feeds(object):
         self.feeds[server][channel][name]['template'] = "$name:\n$title"
         self.save_feeds()
 
-    async def delete_feed(self,ctx,name):
+    async def delete_feed(self, ctx, name):
         server = ctx.message.server.id
         channel = ctx.message.channel.id
         if server not in self.feeds:
@@ -82,11 +80,12 @@ class Feeds(object):
         self.save_feeds()
         return True
 
-    def get_feed_names(self,server):
+    def get_feed_names(self, server):
         pass
 
     def get_copy(self):
         return self.feeds.copy()
+
 
 class RSS(object):
     def __init__(self, bot):
@@ -109,7 +108,7 @@ class RSS(object):
             pass
         return text
 
-    async def valid_url(self,url):
+    async def valid_url(self, url):
         text = await self._get_feed(url)
         rss = feedparser.parse(text)
         if rss.bozo:
@@ -118,32 +117,32 @@ class RSS(object):
             return True
 
     @commands.group(pass_context=True)
-    async def rss(self,ctx):
+    async def rss(self, ctx):
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @rss.command(pass_context=True,name="add")
-    async def _rss_add(self, ctx, name : str, url : str):
+    @rss.command(pass_context=True, name="add")
+    async def _rss_add(self, ctx, name: str, url: str):
         valid_url = await self.valid_url(url)
         if valid_url:
-            self.feeds.add_feed(ctx,name,url)
+            self.feeds.add_feed(ctx, name, url)
             await self.bot.say('Feed "{}" added. Modify the template using rss template'.format(name))
         else:
             await self.bot.say('Invalid or unavailable URL.')
 
-    @rss.command(pass_context=True,name="template")
-    async def _rss_template(self,ctx,feed_name : str,*, template : str):
-        template = template.replace("\\t","\t")
-        template = template.replace("\\n","\n")
-        success = await self.feeds.edit_template(ctx,feed_name,template)
+    @rss.command(pass_context=True, name="template")
+    async def _rss_template(self, ctx, feed_name: str, *, template: str):
+        template = template.replace("\\t", "\t")
+        template = template.replace("\\n", "\n")
+        success = await self.feeds.edit_template(ctx, feed_name, template)
         if success:
             await self.bot.say("Template added successfully.")
         else:
             await self.bot.say('Feed not found!')
 
-    @rss.command(pass_context=True,name="remove")
-    async def _rss_remove(self, ctx, name : str):
-        success = await self.feeds.delete_feed(ctx,name)
+    @rss.command(pass_context=True, name="remove")
+    async def _rss_remove(self, ctx, name: str):
+        success = await self.feeds.delete_feed(ctx, name)
         if success:
             await self.bot.say('Feed deleted.')
         else:
@@ -155,7 +154,7 @@ class RSS(object):
             feeds = self.feeds.get_copy()
             for server in feeds:
                 for chan_id in feeds[server]:
-                    for name,items in feeds[server][chan_id].items():
+                    for name, items in feeds[server][chan_id].items():
                         url = items['url']
                         last_title = items['last']
                         template = items['template']
@@ -171,9 +170,11 @@ class RSS(object):
                                 name=bold(name),
                                 **latest
                             )
-                            self.feeds.update_time(server,chan_id,name,curr_title)
-                            await self.bot.send_message(channel,message)
+                            self.feeds.update_time(
+                                server, chan_id, name, curr_title)
+                            await self.bot.send_message(channel, message)
             await asyncio.sleep(300)
+
 
 def setup(bot):
     n = RSS(bot)
