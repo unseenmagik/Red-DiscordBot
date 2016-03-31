@@ -126,7 +126,8 @@ class RSS(object):
         valid_url = await self.valid_url(url)
         if valid_url:
             self.feeds.add_feed(ctx, name, url)
-            await self.bot.say('Feed "{}" added. Modify the template using rss template'.format(name))
+            await self.bot.say('Feed "{}" added. Modify the template using'
+                               ' rss template'.format(name))
         else:
             await self.bot.say('Invalid or unavailable URL.')
 
