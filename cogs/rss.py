@@ -60,7 +60,8 @@ class Feeds(object):
         channel = ctx.message.channel.id
         if server not in self.feeds:
             self.feeds[server] = {}
-        self.feeds[server][channel] = {}
+        if channel not in self.feeds[server]:
+            self.feeds[server][channel] = {}
         self.feeds[server][channel][name] = {}
         self.feeds[server][channel][name]['url'] = url
         self.feeds[server][channel][name]['last'] = ""
