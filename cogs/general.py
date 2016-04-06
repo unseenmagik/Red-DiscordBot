@@ -8,7 +8,8 @@ import aiohttp
 import asyncio
 import re
 
-settings = {"POLL_DURATION" : 60}
+settings = {"POLL_DURATION": 60}
+
 
 class General:
     """General commands."""
@@ -50,7 +51,7 @@ class General:
         Z refers to the modifier
         """
         d20_pattern = "(\d+)d(\d+)\+*(\d+)?"
-        number_pattern ="(\d+)"
+        number_pattern = "(\d+)"
 
         if dice_string:
             d20 = re.split(d20_pattern, dice_string[0].replace(" ", ""))
@@ -78,7 +79,7 @@ class General:
             return await self.bot.say(":game_die: " + str(randint(1, 100)) + " :game_die:")
 
     @commands.command(pass_context=True)
-    async def flip(self, ctx, user : discord.Member=None):
+    async def flip(self, ctx, user: discord.Member=None):
         """Flips a coin... or a user.
 
         Defaults to coin.
@@ -101,12 +102,12 @@ class General:
             return await self.bot.say("*flips a coin and... " + randchoice(["HEADS!*", "TAILS!*"]))
 
     @commands.command(pass_context=True)
-    async def rps(self, ctx, choice : str):
+    async def rps(self, ctx, choice: str):
         """Play rock paper scissors"""
         author = ctx.message.author
-        rpsbot = {"rock" : ":moyai:",
-           "paper": ":page_facing_up:",
-           "scissors":":scissors:"}
+        rpsbot = {"rock": ":moyai:",
+                  "paper": ":page_facing_up:",
+                  "scissors": ":scissors:"}
         choice = choice.lower()
         if choice in rpsbot.keys():
             botchoice = randchoice(list(rpsbot.keys()))
@@ -167,7 +168,7 @@ class General:
         await self.bot.say("http://lmgtfy.com/?q=" + text)
 
     @commands.command(no_pm=True, hidden=True)
-    async def hug(self, user : discord.Member, intensity : int=1):
+    async def hug(self, user: discord.Member, intensity: int=1):
         """Because everyone likes hugs
 
         Up to 10 intensity levels."""
@@ -185,7 +186,7 @@ class General:
         await self.bot.say(msg)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def info(self, ctx, user : discord.Member = None):
+    async def info(self, ctx, user: discord.Member=None):
         """Shows users's informations"""
         author = ctx.message.author
         if not user:
@@ -193,8 +194,9 @@ class General:
         roles = []
         for m in user.roles:
             if m.name != "@everyone":
-                roles.append('"' + m.name + '"') #.replace("@", "@\u200b")
-        if not roles: roles = ["None"]
+                roles.append('"' + m.name + '"')  # .replace("@", "@\u200b")
+        if not roles:
+            roles = ["None"]
         data = "```python\n"
         data += "Name: " + user.name + "#{}\n".format(user.discriminator)
         data += "ID: " + user.id + "\n"
@@ -209,7 +211,8 @@ class General:
     async def server(self, ctx):
         """Shows server's informations"""
         server = ctx.message.server
-        online = str(len([m.status for m in server.members if str(m.status) == "online" or str(m.status) == "idle"]))
+        online = str(len([m.status for m in server.members if str(
+            m.status) == "online" or str(m.status) == "idle"]))
         total = str(len(server.members))
 
         data = "```\n"
@@ -220,24 +223,26 @@ class General:
         data += "Channels: {}\n".format(str(len(server.channels)))
         data += "Roles: {}\n".format(str(len(server.roles)))
         data += "Created: {}\n".format(str(server.created_at))
-        data += "Owner: {}#{}\n".format(server.owner.name, server.owner.discriminator)
+        data += "Owner: {}#{}\n".format(server.owner.name,
+                                        server.owner.discriminator)
         data += "Icon: {}\n".format(server.icon_url)
         data += "```"
         await self.bot.say(data)
-        
+
     @commands.command()
-    async def urban(self, *, search_terms : str):
+    async def urban(self, *, search_terms: str):
         """Urban Dictionary search"""
         search_terms = search_terms.split(" ")
         search_terms = "+".join(search_terms)
-        search = "http://api.urbandictionary.com/v0/define?term=" + search_terms
+        search = "http://api.urbandictionary.com/v0/define?term=" + \
+            search_terms
         try:
             async with aiohttp.get(search) as r:
                 result = await r.json()
             if result["list"] != []:
                 definition = result['list'][0]['definition']
                 example = result['list'][0]['example']
-                await self.bot.say("**Definition:** " + definition + "\n\n" + "**Example:** " + example )
+                await self.bot.say("**Definition:** " + definition + "\n\n" + "**Example:** " + example)
             else:
                 await self.bot.say("Your search terms gave no results.")
         except:
@@ -268,7 +273,7 @@ class General:
     async def endpoll(self, message):
         if self.getPollByChannel(message):
             p = self.getPollByChannel(message)
-            if p.author == message.author.id: # or isMemberAdmin(message)
+            if p.author == message.author.id:  # or isMemberAdmin(message)
                 await self.getPollByChannel(message).endPoll()
             else:
                 await self.bot.say("Only admins and the author can stop the poll.")
@@ -284,7 +289,7 @@ class General:
     async def check_poll_votes(self, message):
         if message.author.id != self.bot.user.id:
             if self.getPollByChannel(message):
-                    self.getPollByChannel(message).checkAnswer(message)
+                self.getPollByChannel(message).checkAnswer(message)
 
 
 class NewPoll():
@@ -295,7 +300,7 @@ class NewPoll():
         self.poll_sessions = main.poll_sessions
         msg = message.content[6:]
         msg = msg.split(";")
-        if len(msg) < 2: # Needs at least one question and 2 choices
+        if len(msg) < 2:  # Needs at least one question and 2 choices
             self.valid = False
             return None
         else:
@@ -305,8 +310,8 @@ class NewPoll():
         msg.remove(self.question)
         self.answers = {}
         i = 1
-        for answer in msg: # {id : {answer, votes}}
-            self.answers[i] = {"ANSWER" : answer, "VOTES" : 0}
+        for answer in msg:  # {id : {answer, votes}}
+            self.answers[i] = {"ANSWER": answer, "VOTES": 0}
             i += 1
 
     async def start(self):
@@ -323,7 +328,8 @@ class NewPoll():
         self.valid = False
         msg = "**POLL ENDED!**\n\n{}\n\n".format(self.question)
         for data in self.answers.values():
-            msg += "*{}* - {} votes\n".format(data["ANSWER"], str(data["VOTES"]))
+            msg += "*{}* - {} votes\n".format(
+                data["ANSWER"], str(data["VOTES"]))
         await self.client.send_message(self.channel, msg)
         self.poll_sessions.remove(self)
 
@@ -339,14 +345,8 @@ class NewPoll():
         except ValueError:
             pass
 
-def setup(bot):
-    General(bot)
 
-'''def setup(bot):
+def setup(bot):
     n = General(bot)
     bot.add_listener(n.check_poll_votes, "on_message")
-<<<<<<< HEAD
-    bot.add_cog(n)'''
-=======
     bot.add_cog(n)
->>>>>>> 71dc5ea7514731ee25fb828f60baee87ac7bbcf0
