@@ -1,0 +1,883 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"rep",
+				"repo_name	param"
+			],
+			[
+				"info",
+				"info_file"
+			],
+			[
+				"cog",
+				"cog_data_path"
+			],
+			[
+				"repo",
+				"repo_name"
+			],
+			[
+				"cog_",
+				"cog_folder_path"
+			],
+			[
+				"leg",
+				"legacy_path	statement"
+			],
+			[
+				"legacy",
+				"legacy_folders"
+			],
+			[
+				"legac",
+				"legacy_path"
+			],
+			[
+				"list",
+				"list_cogs	function"
+			],
+			[
+				"base",
+				"base_command	statement"
+			],
+			[
+				"to",
+				"to_execute	param"
+			],
+			[
+				"prev",
+				"previous_invoked"
+			],
+			[
+				"invoked",
+				"invoked_subcommand"
+			],
+			[
+				"color",
+				"colorAppearsInBlock"
+			],
+			[
+				"save",
+				"save_welcome"
+			],
+			[
+				"defaul",
+				"default_channel"
+			],
+			[
+				"channel",
+				"channel_mentions"
+			],
+			[
+				"chann",
+				"channel_mentions"
+			],
+			[
+				"send",
+				"send_message"
+			],
+			[
+				"welcome",
+				"welcome_messages"
+			],
+			[
+				"resp",
+				"resp"
+			],
+			[
+				"has",
+				"hasattr"
+			],
+			[
+				"even",
+				"event_method"
+			],
+			[
+				"Check",
+				"CheckFailure"
+			],
+			[
+				"valid",
+				"validServer"
+			],
+			[
+				"file",
+				"filename"
+			],
+			[
+				"last",
+				"last_notify"
+			],
+			[
+				"registr",
+				"registryFilename"
+			],
+			[
+				"async",
+				"asyncio"
+			],
+			[
+				"audio",
+				"audio_loader"
+			],
+			[
+				"is",
+				"isfile"
+			],
+			[
+				"comman",
+				"command_prefix"
+			],
+			[
+				"stop",
+				"stop_trivia"
+			],
+			[
+				"api",
+				"api_secret"
+			],
+			[
+				"proc",
+				"process_commands"
+			],
+			[
+				"get",
+				"get_channel_object"
+			],
+			[
+				"curr",
+				"curr_time"
+			],
+			[
+				"add",
+				"add_feed"
+			],
+			[
+				"module",
+				"moduleInfo"
+			],
+			[
+				"laod",
+				"load_extension"
+			],
+			[
+				"direc",
+				"directories"
+			],
+			[
+				"Trivia",
+				"TriviaSession"
+			],
+			[
+				"close",
+				"closeRegistry"
+			],
+			[
+				"limi",
+				"limit_per_message"
+			],
+			[
+				"_add",
+				"_add_emote"
+			],
+			[
+				"chan",
+				"chan_id"
+			],
+			[
+				"emote",
+				"emoteset"
+			],
+			[
+				"send_",
+				"send_cmd_help"
+			],
+			[
+				"mentiontra",
+				"MentionTracker"
+			],
+			[
+				"star",
+				"startswith"
+			],
+			[
+				"new",
+				"new_prefix"
+			],
+			[
+				"default",
+				"default_admin"
+			],
+			[
+				"settig",
+				"settings_obj"
+			],
+			[
+				"setting",
+				"settings_obj"
+			],
+			[
+				"defau",
+				"default_mod"
+			],
+			[
+				"defa",
+				"default"
+			],
+			[
+				"modrole",
+				"mod_role"
+			],
+			[
+				"adminro",
+				"admin_role"
+			],
+			[
+				"Modrol",
+				"MOD_ROLE"
+			],
+			[
+				"bot",
+				"bot_settings"
+			],
+			[
+				"admin",
+				"admin_or_permissions"
+			],
+			[
+				"TIME",
+				"MENTION_TIME_LIMIT"
+			],
+			[
+				"mentiontrack",
+				"mentiontracker"
+			],
+			[
+				"in",
+				"invoked_subcommand"
+			],
+			[
+				"pass",
+				"pass_context"
+			],
+			[
+				"help",
+				"help_cmd"
+			],
+			[
+				"server",
+				"server_aliases"
+			],
+			[
+				"mana",
+				"manage_messages"
+			],
+			[
+				"exc",
+				"Exception"
+			],
+			[
+				"memb",
+				"member_dict"
+			],
+			[
+				"mem",
+				"member_id"
+			],
+			[
+				"poss",
+				"possibilities"
+			],
+			[
+				"Opt",
+				"OpticalDrive"
+			],
+			[
+				"section",
+				"sectionData"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 227.0,
+		"last_filter": "push",
+		"selected_items":
+		[
+			[
+				"push",
+				"Git: Push Current Branch"
+			],
+			[
+				"comm",
+				"Git: Commit"
+			],
+			[
+				"add",
+				"Git: Add Current File"
+			],
+			[
+				"git com",
+				"Git: Commit"
+			],
+			[
+				"compl",
+				"Anaconda: McCabe complexity check"
+			],
+			[
+				"anacon",
+				"Anaconda: Show error list"
+			],
+			[
+				"anaconda",
+				"Anaconda: Show error list"
+			],
+			[
+				"com",
+				"Git: Commit"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"branch",
+				"Git: New Branch"
+			],
+			[
+				"compare",
+				"GitGutter: Compare Against Branch"
+			],
+			[
+				"co",
+				"Git: Commit"
+			],
+			[
+				"a",
+				"Git: Add Current File"
+			],
+			[
+				"pu",
+				"Git: Push"
+			],
+			[
+				"commit",
+				"Git: Commit"
+			],
+			[
+				"diff",
+				"Git: Diff Current File"
+			],
+			[
+				"checkou",
+				"Git: Checkout Current File"
+			],
+			[
+				"gist",
+				"Git: Status"
+			],
+			[
+				"Package Control: dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"Package Control: in",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 446.0
+	},
+	"console":
+	{
+		"height": 95.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/Will/Desktop/Red-DiscordBot"
+	],
+	"file_history":
+	[
+		"/C/Users/Will/Desktop/Red-Testing/cogs/downloader.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/downloader.py",
+		"/C/Users/Will/Desktop/Red-Testing/data/downloader/repos.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/botinfo.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/main.py",
+		"/C/Users/Will/Desktop/Red-Testing/cogs/alias.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/rss.py",
+		"/C/Users/Will/Desktop/discord.py/discord/ext/commands/core.py",
+		"/C/Users/Will/Desktop/Squid-Plugins/test/test.py",
+		"/C/Users/Will/Desktop/Red-Testing/cogs/test.py",
+		"/C/Users/Will/Desktop/Red-Testing/Red-Testing.sublime-project",
+		"/C/Users/Will/OneDrive/UC 2015-2016/ProgLang/cracker_barrel.clingo",
+		"/D/Users/Will/Downloads/status.py",
+		"/C/Users/Will/OneDrive/UC 2015-2016/ProgLang/sudoku-hw.clingo",
+		"/C/Users/Will/OneDrive/UC 2015-2016/ProgLang/sudoku.clingo",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/errand.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/status.py",
+		"/D/Users/Will/Downloads/prog4.shell.txt",
+		"/D/Users/Will/Downloads/prog4.shell (1).txt",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/botinfo/welcome.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/streams.py",
+		"/C/Users/Will/Desktop/discord.py/discord/ext/commands/errors.py",
+		"/C/Users/Will/Desktop/discord.py/discord/utils.py",
+		"/C/Users/Will/Desktop/discord.py/discord/client.py",
+		"/C/Users/Will/Desktop/discord.py/discord/ext/commands/bot.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/cleverbot.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/mentiontracker/mail.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/emotes.py",
+		"/C/Users/Will/Desktop/Red-Testing/red/registry.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/bot.py",
+		"/C/Users/Will/Desktop/test.py",
+		"/C/Users/Will/Desktop/Red-Testing/cogs/config.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/RSS/feeds.json",
+		"/C/Users/Will/Desktop/Red-Testing/red/conf.py",
+		"/C/Users/Will/Desktop/Red-Testing/main.py",
+		"/C/Users/Will/Desktop/Red-Testing/wizard.py",
+		"/C/Users/Will/Desktop/discord.py/discord/state.py",
+		"/C/Users/Will/Desktop/discord.py/discord/object.py",
+		"/C/Users/Will/Desktop/discord.py/discord/ext/commands/__init__.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/mod/filter.json",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/run.py",
+		"/C/Users/Will/Desktop/Red-Testing/data/red/Red.conf",
+		"/C/Users/Will/Desktop/Red-Testing/data/red/settings.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/conf.py",
+		"/C/Users/Will/Desktop/Red-Testing/red/questions.py",
+		"/C/Users/Will/Desktop/Red-Testing/red/utils/__init__.py",
+		"/C/Users/Will/Desktop/Red-Testing/red/utils/file.py",
+		"/C/Users/Will/Desktop/Red-Testing/y.conf",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/SquidBot.conf",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/red/Red.conf",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/registry.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/mentiontracker.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/utils/gen.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/utils/str.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/utils/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/registry.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/conf.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/red/utils/web.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/utils/conf.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/utils/registry.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/audio.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/trivia.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/lastfm.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/image.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/.gitignore",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/rules.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/general.py",
+		"/C/Users/Will/Desktop/Red-Testing/red.py",
+		"/C/Users/Will/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/ascii.py",
+		"/C/Users/Will/Desktop/Red-Testing/data/downloader/squid/test.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/alias.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/i18n.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/runescape/__init__.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/TODO.txt",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/karma/karma.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/RSS/plugin.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/RSS/messages.pot",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/RSS/config.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/RSS/__init__.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/runescape/runescape.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/runescape/locales/es.po",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/runescape/messages.pot",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/tickets.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/quotes.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/customcom.py",
+		"/C/Users/Will/OneDrive/UC 2015-2016/ProgLang/soduko.sml",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/league.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/economy.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/mod.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/karma/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/logs/messages.log",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/pluginutils/checks.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/Trivia/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/Runescape/runescape.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/Runescape/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/pluginutils/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/pluginutils/dataIO.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/pluginutils/dataIO.py.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/pluginutils/fileIO.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/discordutils.py",
+		"/C/Users/Will/Desktop/Limnoria-master/src/ircutils.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/drivers.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/Runescape/config.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/Owner/plugin.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/world.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/callbacks.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/plugin.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/wizard.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/trivia_hijack.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/trivia_hijack.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/log.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/README.md",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/test_inject.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/league.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot/bot.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/utils/__init__.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/questions.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/utils/python.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/i18n.py",
+		"/C/Users/Will/Desktop/Limnoria-master/src/plugin.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/shlex.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/utils/str.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/version.py",
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/ansi.py"
+	],
+	"find":
+	{
+		"height": 70.0
+	},
+	"find_in_files":
+	{
+		"height": 158.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"name",
+			"repo_path",
+			"folder_path",
+			"^empty",
+			"ntpath",
+			"self.cleverbot",
+			"self",
+			"ev",
+			"dispatch",
+			"inspect",
+			"dispatch",
+			"utils",
+			"dispatch",
+			"channel",
+			"registerChannel",
+			"server",
+			"server.id))\n            value = _('Global: %s; %s: %",
+			"ircutils.isChannel",
+			"supybot",
+			"settings",
+			"squidbot",
+			"file.Atomic",
+			"force",
+			" _(",
+			"(_(",
+			"squid",
+			"squidbot",
+			"= _(",
+			"_(",
+			"internationalize",
+			"squidbot",
+			"_(",
+			"utils",
+			"version",
+			"utils",
+			"user",
+			"name",
+			"['INSTALLED']",
+			".list_cogs",
+			"file",
+			"os.join",
+			"set_cog",
+			"imp.",
+			"imp",
+			"pot",
+			"alias",
+			"sid",
+			"ctx.server.id",
+			"streams",
+			"print(",
+			"remove_command",
+			"module",
+			"localeName",
+			"import supy",
+			"list_cogs",
+			"load",
+			"defaultplugins",
+			"world",
+			"makechannel",
+			"module",
+			"whenaddres",
+			"whenaddresed",
+			"squidbot.plugins",
+			"supybot",
+			"debug",
+			"stdout",
+			"conf.",
+			"log",
+			"econ",
+			"self.",
+			"@bot",
+			"world.bot",
+			"@self",
+			"print(",
+			"InvalidRegistryValue",
+			"InvalidRegistryName",
+			"server",
+			"group",
+			"split",
+			"maximum",
+			"mores",
+			"supy",
+			"channel",
+			"supy",
+			"conf.supybot.",
+			"conf.squid.",
+			"supy",
+			"ValidServer",
+			"ircutils",
+			"from squidbot",
+			"import squidbot",
+			"supy",
+			"import squidbot",
+			"squidbot",
+			"channel",
+			"supy",
+			"print",
+			"prefix",
+			"supy",
+			"world",
+			"supy",
+			"json",
+			"supy",
+			"channel",
+			"Channel",
+			"channel",
+			"Channel",
+			"supy",
+			"ircutils",
+			"supybot",
+			"utils.",
+			"minisix",
+			"(*",
+			"wait_for_an",
+			"threading",
+			"bot.command",
+			"max_length",
+			"maxlength",
+			"empty_cache",
+			"cache",
+			"maxlength",
+			"set_cog",
+			"list_cogs",
+			"reptracker",
+			"rep",
+			"RepTracker",
+			"help",
+			"Kappa"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"validServer",
+			" red",
+			" (",
+			"((",
+			"red",
+			"= (",
+			"__(",
+			"(",
+			"red",
+			"(",
+			"os.path.join",
+			"trivia",
+			"",
+			"@world.bot",
+			"bot",
+			"@world.bot",
+			"bot",
+			"squid",
+			"server",
+			"squid",
+			"conf.squidbot.",
+			"squid",
+			"from squid",
+			"import squid",
+			"squid",
+			"server",
+			"squid",
+			"log.info",
+			"squid",
+			"server",
+			"Server",
+			"server",
+			"Server",
+			"squid",
+			"(self,*",
+			"is_alone_or_admin(msg)",
+			"(",
+			"",
+			"ticket",
+			"tickets",
+			"    "
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 29.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 100.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 144.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 246.0
+	},
+	"pinned_build_system": "",
+	"project": "Red-DiscordBot.sublime-project",
+	"replace":
+	{
+		"height": 54.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"repos",
+				"data\\downloader\\repos.json"
+			],
+			[
+				"alias",
+				"cogs\\alias.py"
+			],
+			[
+				"",
+				"cogs\\downloader.py"
+			],
+			[
+				"downlaod",
+				"cogs\\downloader.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"C:\\Users\\Will\\Desktop\\Red-Testing\\Red-Testing.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+		"max_columns": 1
+	}
+}

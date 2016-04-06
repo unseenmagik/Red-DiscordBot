@@ -7,38 +7,42 @@ from cogs.utils import checks
 from __main__ import send_cmd_help
 import os
 
+
 class Alias:
-    def __init__(self,bot):
+    def __init__(self, bot):
         self.bot = bot
-        self.aliases = fileIO("data/alias/aliases.json","load")
+        self.aliases = fileIO("data/alias/aliases.json", "load")
 
     @commands.group(pass_context=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def alias(self,ctx):
+    async def alias(self, ctx):
         """Manage per-server aliases for commands"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @alias.command(name="add",pass_context=True)
-    async def _add_alias(self,ctx,command : str,*,to_execute):
+    @alias.command(name="add", pass_context=True)
+    async def _add_alias(self, ctx, command: str, *, to_execute):
         """Add an alias for a command
 
            Example: !alias add test flip @Twentysix"""
         server = ctx.message.server
-        if self.get_prefix(to_execute) == False:
-            to_execute = self.bot.command_prefix[0] + to_execute
+        prefix = self.get_prefix(to_execute)
+        base_command = to_execute[len(prefix):].split(" ")[0]
+        if prefix:
+            await self.bot.say(("'{}' is not a".format(prefix+base_command)) +
+                               " valid command to alias!")
+            return
         if server.id not in self.aliases:
             self.aliases[server.id] = {}
-        #curr_aliases = self.aliases[server.id]
         if command not in self.bot.commands:
             self.aliases[server.id][command] = to_execute
-            fileIO("data/alias/aliases.json","save",self.aliases)
+            fileIO("data/alias/aliases.json", "save", self.aliases)
             await self.bot.say("Alias '{}' added.".format(command))
         else:
-            await self.bot.say("Cannot add '{}' because it's a real bot command.".format(command))        
+            await self.bot.say("Cannot add '{}' because it's a real bot command.".format(command))
 
-    @alias.command(name="help",pass_context=True)
-    async def _help_alias(self,ctx,command):
+    @alias.command(name="help", pass_context=True)
+    async def _help_alias(self, ctx, command):
         """Tries to execute help for the base command of the alias"""
         server = ctx.message.server
         if server.id in self.aliases:
@@ -54,8 +58,8 @@ class Alias:
             else:
                 await self.bot.say("That alias doesn't exist.")
 
-    @alias.command(name="show",pass_context=True)
-    async def _show_alias(self,ctx,command):
+    @alias.command(name="show", pass_context=True)
+    async def _show_alias(self, ctx, command):
         """Shows what command the alias executes."""
         server = ctx.message.server
         if server.id in self.aliases:
@@ -65,17 +69,20 @@ class Alias:
             else:
                 await self.bot.say("That alias doesn't exist.")
 
-    @alias.command(name="del",pass_context=True)
-    async def _del_alias(self,ctx,command : str):
+    @alias.command(name="del", pass_context=True)
+    async def _del_alias(self, ctx, command: str):
         """Deletes an alias"""
         server = ctx.message.server
         if server.id in self.aliases:
-            self.aliases[server.id].pop(command,None)
-            fileIO("data/alias/aliases.json","save",self.aliases)
-        await self.bot.say("Alias '{}' deleted.".format(command))
+            self.aliases[server.id].pop(command, None)
+            fileIO("data/alias/aliases.json", "save", self.aliases)
+            await self.bot.say("Alias '{}' deleted.".format(command))
+        else:
+            await self.bot.say("Alias not found.")
 
-    async def check_aliases(self,message):
-        if message.author.id == self.bot.user.id or len(message.content) < 2 or message.channel.is_private:
+    async def check_aliases(self, message):
+        if message.author.id == self.bot.user.id or \
+                len(message.content) < 2 or message.channel.is_private:
             return
 
         msg = message.content
@@ -92,7 +99,7 @@ class Alias:
                 new_message.content = content
                 await self.bot.process_commands(new_message)
 
-    def first_word(self,msg):
+    def first_word(self, msg):
         return msg.split(" ")[0]
 
     def get_prefix(self, msg):
@@ -101,10 +108,12 @@ class Alias:
                 return p
         return False
 
+
 def check_folder():
     if not os.path.exists("data/alias"):
         print("Creating data/alias folder...")
         os.makedirs("data/alias")
+
 
 def check_file():
     aliases = {}
@@ -113,6 +122,7 @@ def check_file():
     if not fileIO(f, "check"):
         print("Creating default alias's aliases.json...")
         fileIO(f, "save", aliases)
+
 
 def setup(bot):
     check_folder()

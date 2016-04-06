@@ -67,7 +67,7 @@ class BotInfo:
         else:
             await self.bot.say("Sorry, my owner is offline, try again later?")
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, no_pm=True)
     async def welcome(self, ctx):
         if not ctx.invoked_subcommand:
             await send_cmd_help(ctx)

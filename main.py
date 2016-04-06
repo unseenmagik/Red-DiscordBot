@@ -23,8 +23,6 @@ import timeit
 import red.registry as registry
 from red.bot import Bot, Ignoring
 
-from cogs.utils import checks
-
 #
 #  Red, a Discord bot by Twentysix, based on discord.py
 #     and its command extension
@@ -46,6 +44,8 @@ bot = commands.Bot(command_prefix=["_"], formatter=formatter,
                    description=description, pm_help=None,
                    override_event_control=True)
 settings = Settings()
+
+import cogs.utils.checks as checks
 
 registryFilename = "data/red/Red.conf"
 '''try:
