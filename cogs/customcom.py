@@ -1,9 +1,9 @@
-import discord
 from discord.ext import commands
 from cogs.utils.dataIO import fileIO
 from cogs.utils import checks
 from __main__ import user_allowed, send_cmd_help
 import os
+
 
 class CustomCommands:
     """Custom commands."""
@@ -14,21 +14,22 @@ class CustomCommands:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def addcom(self, ctx, command : str, *text):
+    async def addcom(self, ctx, command: str, *, text):
         """Adds a custom command
 
         Example:
         !addcom yourcommand Text you want
         """
-        if text == ():
+        if len(text) == 0:
             await send_cmd_help(ctx)
             return
         server = ctx.message.server
         content = ctx.message.content
         chars = (len(ctx.prefix), len(ctx.invoked_with), len(command))
-        text = content[chars[0] + chars[1] + chars[2] + 2:] # Gets text of the command
+        # Gets text of the command
+        text = content[chars[0] + chars[1] + chars[2] + 2:]
         command = command.lower()
-        if not server.id in self.c_commands:
+        if server.id not in self.c_commands:
             self.c_commands[server.id] = {}
         cmdlist = self.c_commands[server.id]
         if command not in cmdlist:
@@ -37,23 +38,25 @@ class CustomCommands:
             fileIO("data/customcom/commands.json", "save", self.c_commands)
             await self.bot.say("Custom command successfully added.")
         else:
-            await self.bot.say("This command already exists. Use editcom to edit it.")
+            await self.bot.say("This command already exists. "
+                               "Use editcom to edit it.")
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def editcom(self, ctx, command : str, *text):
+    async def editcom(self, ctx, command: str, *, text):
         """Edits a custom command
 
         Example:
         !editcom yourcommand Text you want
         """
-        if text == ():
+        if len(text) == 0:
             await send_cmd_help(ctx)
             return
         server = ctx.message.server
         content = ctx.message.content
         chars = (len(ctx.prefix), len(ctx.invoked_with), len(command))
-        text = content[chars[0] + chars[1] + chars[2] + 2:] # Gets text of the command
+        # Gets text of the command
+        text = content[chars[0] + chars[1] + chars[2] + 2:]
         command = command.lower()
         if server.id in self.c_commands:
             cmdlist = self.c_commands[server.id]
@@ -63,13 +66,15 @@ class CustomCommands:
                 fileIO("data/customcom/commands.json", "save", self.c_commands)
                 await self.bot.say("Custom command successfully edited.")
             else:
-                await self.bot.say("That command doesn't exist. Use addcom [command] [text]")
+                await self.bot.say("That command doesn't exist. "
+                                   "Use addcom [command] [text]")
         else:
-             await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+            await self.bot.say("There are no custom commands in this server. "
+                               "Use addcom [command] [text]")
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def delcom(self, ctx, command : str):
+    async def delcom(self, ctx, command: str):
         """Deletes a custom command
 
         Example:
@@ -86,7 +91,8 @@ class CustomCommands:
             else:
                 await self.bot.say("That command doesn't exist.")
         else:
-            await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+            await self.bot.say("There are no custom commands in this server. "
+                               "Use addcom [command] [text]")
 
     @commands.command(pass_context=True, no_pm=True)
     async def customcommands(self, ctx):
@@ -108,12 +114,15 @@ class CustomCommands:
                 for cmds in msg:
                     await self.bot.whisper(cmds)
             else:
-                await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+                await self.bot.say("There are no custom commands in this "
+                                   "server. Use addcom [command] [text]")
         else:
-            await self.bot.say("There are no custom commands in this server. Use addcom [command] [text]")
+            await self.bot.say("There are no custom commands in this server. "
+                               "Use addcom [command] [text]")
 
     async def checkCC(self, message):
-        if message.author.id == self.bot.user.id or len(message.content) < 2 or message.channel.is_private:
+        if message.author.id == self.bot.user.id or len(message.content) < 2 \
+                or message.channel.is_private:
             return
 
         if not user_allowed(message):
@@ -129,7 +138,8 @@ class CustomCommands:
             if cmd in cmdlist.keys():
                 await self.bot.send_message(message.channel, cmdlist[cmd])
             elif cmd.lower() in cmdlist.keys():
-                await self.bot.send_message(message.channel, cmdlist[cmd.lower()])
+                await self.bot.send_message(message.channel,
+                                            cmdlist[cmd.lower()])
 
     def get_prefix(self, msg):
         for p in self.bot.command_prefix:
@@ -137,16 +147,19 @@ class CustomCommands:
                 return p
         return False
 
+
 def check_folders():
     if not os.path.exists("data/customcom"):
         print("Creating data/customcom folder...")
         os.makedirs("data/customcom")
+
 
 def check_files():
     f = "data/customcom/commands.json"
     if not fileIO(f, "check"):
         print("Creating empty commands.json...")
         fileIO(f, "save", {})
+
 
 def setup(bot):
     check_folders()
