@@ -42,8 +42,8 @@ class ChannelLogger(object):
         fname = 'data/channellogger/{}/{}.log'.format(serverid, channelid)
         with open(fname, 'a') as f:
             to_write = ("{0.timestamp} #{1.name} @{2.name}#{2.discriminator}: "
-                        "{0.content}\n".format(message, message.channel,
-                                               message.author))
+                        "{0.clean_content}\n".format(message, message.channel,
+                                                     message.author))
             f.write(to_write)
 
     async def message_logger(self, message):
