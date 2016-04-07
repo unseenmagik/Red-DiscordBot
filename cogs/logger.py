@@ -15,16 +15,41 @@ class ChannelLogger(object):
         self.channels = fileIO("data/channellogger/channels.json", "load")
 
     @commands.command(pass_context=True)
+    @checks.mod_or_permissions(manage_messages=True)
     async def logger(self, ctx):
         """Toggles logging for a channel"""
-        pass
+        channel = ctx.message.channel
+        if channel.id not in self.channels:
+            self.channels[channel.id] = True
+        else:
+            self.channels[channel.id] = not self.channels[channel.id]
+        if self.channels[channel.id]:
+            await self.bot.say('Logging enabled'
+                               ' for {}'.format(channel.mention))
+        else:
+            await self.bot.say('Logging disabled'
+                               ' for {}'.format(channel.mention))
+        self.save_channels()
 
-    async def log():
-        pass
+    def save_channels(self):
+        fileIO('data/channellogger/channels.json', 'save', self.channels)
 
-    async def on_message(self, message):
-        if message.channel.id in self.channels:
-            discord.utils.soemthing(self.log(message))
+    def log(self, message):
+        serverid = message.server.id
+        channelid = message.channel.id
+        if not os.path.exists('data/channellogger/{}'.format(serverid)):
+            os.mkdir('data/channellogger/{}'.format(serverid))
+        fname = 'data/channellogger/{}/{}.log'.format(serverid, channelid)
+        with open(fname, 'a') as f:
+            to_write = ("{0.timestamp} #{1.name} @{2.name}#{2.discriminator}: "
+                        "{0.content}\n".format(message, message.channel,
+                                               message.author))
+            f.write(to_write)
+
+    async def message_logger(self, message):
+        enabled = self.channels.get(message.channel.id, False)
+        if enabled:
+            self.log(message)
 
 
 def check_folders():
@@ -42,4 +67,4 @@ def setup(bot):
     check_files()
     n = ChannelLogger(bot)
     bot.add_cog(n)
-    bot.add_extension(n.message_logger, "on_message")
+    bot.add_listener(n.message_logger, "on_message")
