@@ -96,7 +96,10 @@ class RSS(object):
         self.feeds = Feeds()
 
     def get_channel_object(self, channel_id):
-        return self.bot.get_channel(channel_id)
+        channel = self.bot.get_channel(channel_id)
+        if channel.permissions_for(channel.server.me).send_messages:
+            return channel
+        return None
 
     async def _get_feed(self, url):
         text = None
@@ -166,6 +169,8 @@ class RSS(object):
                         curr_title = rss.entries[0].title
                         if curr_title != last_title:
                             channel = self.get_channel_object(chan_id)
+                            if channel is None:
+                                continue
                             latest = rss.entries[0]
                             to_fill = string.Template(template)
                             message = to_fill.safe_substitute(
