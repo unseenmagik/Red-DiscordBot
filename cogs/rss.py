@@ -97,7 +97,8 @@ class RSS(object):
 
     def get_channel_object(self, channel_id):
         channel = self.bot.get_channel(channel_id)
-        if channel.permissions_for(channel.server.me).send_messages:
+        if channel and \
+                channel.permissions_for(channel.server.me).send_messages:
             return channel
         return None
 
