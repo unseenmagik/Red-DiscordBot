@@ -388,6 +388,10 @@ def user_allowed(message):
             server = message.server
             names = (settings.get_server_admin(
                 server), settings.get_server_mod(server))
+            if type(author) is discord.User:
+                print(server.name, message.channel.name, author.name,
+                      author.id)
+                return False
             results = map(
                 lambda name: discord.utils.get(author.roles, name=name), names)
             for r in results:
@@ -524,7 +528,7 @@ def check_configs():
 def set_logger():
     global logger
     logger = logging.getLogger("discord")
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.DEBUG)
     handler = logging.FileHandler(
         filename='data/red/discord.log', encoding='utf-8', mode='a')
     handler.setFormatter(logging.Formatter('%(asctime)s %(message)s',
@@ -617,7 +621,7 @@ def main():
             " yourself as owner.")
     else:
         owner.hidden = True  # Hides the set owner command from help
-    yield from bot.login(settings.email, settings.password)
+    yield from bot.login(settings.token)
     yield from bot.connect()
 
 if __name__ == '__main__':
