@@ -8,3 +8,4 @@ data
 *.dll
 tests
 cogs/errand.py
+cogs/status.py
