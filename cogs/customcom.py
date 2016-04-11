@@ -29,7 +29,14 @@ class CustomCommands:
         # Gets text of the command
         text = content[chars[0] + chars[1] + chars[2] + 2:]
         command = command.lower()
+<<<<<<< HEAD
         if server.id not in self.c_commands:
+=======
+        if command in self.bot.commands.keys():
+            await self.bot.say("That command is already a standard command.")
+            return
+        if not server.id in self.c_commands:
+>>>>>>> a102b8ff80e0b47dee676a582566b59ff1bf7eff
             self.c_commands[server.id] = {}
         cmdlist = self.c_commands[server.id]
         if command not in cmdlist:
