@@ -315,7 +315,8 @@ class Streams:
                     stream["ALREADY_ONLINE"] = True
                     for channel in stream["CHANNELS"]:
                         channel_obj = self.bot.get_channel(channel)
-                        can_speak = channel_obj.permissions_for(channel_obj.server.me).send_messages
+                        if channel_obj:
+                            can_speak = channel_obj.permissions_for(channel_obj.server.me).send_messages 
                         if channel_obj and can_speak:
                             await self.bot.send_message(
                                 self.bot.get_channel(channel),
@@ -332,7 +333,8 @@ class Streams:
                     stream["ALREADY_ONLINE"] = True
                     for channel in stream["CHANNELS"]:
                         channel_obj = self.bot.get_channel(channel)
-                        can_speak = channel_obj.permissions_for(channel_obj.server.me).send_messages
+                        if channel_obj:
+                            can_speak = channel_obj.permissions_for(channel_obj.server.me).send_messages
                         if channel_obj and can_speak:
                             await self.bot.send_message(
                                 self.bot.get_channel(channel),
@@ -349,7 +351,8 @@ class Streams:
                     stream["ALREADY_ONLINE"] = True
                     for channel in stream["CHANNELS"]:
                         channel_obj = self.bot.get_channel(channel)
-                        can_speak = channel_obj.permissions_for(channel_obj.server.me).send_messages
+                        if channel_obj:
+                            can_speak = channel_obj.permissions_for(channel_obj.server.me).send_messages
                         if channel_obj and can_speak:
                             await self.bot.send_message(
                                 self.bot.get_channel(channel),
