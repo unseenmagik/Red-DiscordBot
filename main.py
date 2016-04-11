@@ -559,12 +559,8 @@ def load_cogs():
     register = tuple(data.keys())  # known cogs
     extensions = list_cogs()
 
-<<<<<<< HEAD:main.py
     if extensions:
         print("\nLoading cogs...\n")
-=======
-    if extensions: print("\nLoading cogs...\n")
->>>>>>> a102b8ff80e0b47dee676a582566b59ff1bf7eff:red.py
 
     failed = []
     for extension in extensions:
@@ -591,19 +587,6 @@ def load_cogs():
     with open('data/red/cogs.json', "w") as f:
         f.write(json.dumps(data))
 
-<<<<<<< HEAD:main.py
-=======
-    if extensions:
-        with open('data/red/cogs.json', "w") as f:
-            f.write(json.dumps(data))
-
-    if failed:
-        print("\nFailed to load: ", end="")
-        for m in failed:
-            print(m + " ", end="")
-        print("\n")
->>>>>>> a102b8ff80e0b47dee676a582566b59ff1bf7eff:red.py
-
 def main():
     global settings
     global checks
@@ -622,13 +605,9 @@ def main():
         else:
             print("Once you're owner use !set prefix to set it.")
     if settings.owner == "id_here":
-<<<<<<< HEAD:main.py
         print(
             "Owner has not been set yet. Do '[p]set owner' in chat to set:"
             " yourself as owner.")
-=======
-        print("Owner has not been set yet. Do '{}set owner' in chat to set yourself as owner.".format(bot.command_prefix[0]))
->>>>>>> a102b8ff80e0b47dee676a582566b59ff1bf7eff:red.py
     else:
         owner.hidden = True  # Hides the set owner command from help
     yield from bot.login(settings.token)
