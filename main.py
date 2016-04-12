@@ -623,13 +623,12 @@ if __name__ == '__main__':
         # Hopefully this won't backfire in case of discord servers' problems
         os.remove('data/red/settings.json')
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         bot.loop.run_until_complete(bot.logout())
         pending = asyncio.Task.all_tasks()
         gathered = asyncio.gather(*pending)
         try:
             gathered.cancel()
-            bot.loop.run_forever()
             gathered.exception()
         except:
             pass
