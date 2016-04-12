@@ -8,7 +8,7 @@ class Settings:
     def __init__(self,path=default_path):
         self.path = path
         self.check_folders()
-        self.default_settings = {"EMAIL" : "EmailHere", "PASSWORD" : "PasswordHere", "OWNER" : "id_here", "PREFIXES" : [], "default":{"ADMIN_ROLE" : "Transistor", "MOD_ROLE" : "Process"}}
+        self.default_settings = {"EMAIL" : "EmailHere", "PASSWORD" : "PasswordHere", "TOKEN":"", "OWNER" : "id_here", "PREFIXES" : [], "default":{"ADMIN_ROLE" : "Transistor", "MOD_ROLE" : "Process"}}
         if not fileIO(self.path,"check"):
             self.bot_settings = self.default_settings
             self.save_settings()
@@ -33,6 +33,15 @@ class Settings:
         del self.bot_settings["MOD_ROLE"]
         del self.bot_settings["ADMIN_ROLE"]
         self.bot_settings["default"] = {"MOD_ROLE":mod,"ADMIN_ROLE":admin}
+        self.save_settings()
+
+    @property
+    def token(self):
+        return self.bot_settings["TOKEN"]
+
+    @token.setter
+    def token(self,value):
+        self.bot_settings["TOKEN"] = value
         self.save_settings()
 
     @property

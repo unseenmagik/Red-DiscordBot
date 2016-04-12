@@ -303,6 +303,22 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "main.py",
+			"settings":
+			{
+				"buffer_size": 19216,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "cogs/rss.py",
+			"settings":
+			{
+				"buffer_size": 6405,
+				"line_ending": "Windows"
+			}
+		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -317,7 +333,7 @@
 		[
 			[
 				"push",
-				"Git: Push Current Branch"
+				"Git: Push"
 			],
 			[
 				"comm",
@@ -326,6 +342,14 @@
 			[
 				"add",
 				"Git: Add Current File"
+			],
+			[
+				"com",
+				"Git: Commit"
+			],
+			[
+				"statu",
+				"Git: Status"
 			],
 			[
 				"git com",
@@ -342,10 +366,6 @@
 			[
 				"anaconda",
 				"Anaconda: Show error list"
-			],
-			[
-				"com",
-				"Git: Commit"
 			],
 			[
 				"packa",
@@ -429,13 +449,28 @@
 	],
 	"file_history":
 	[
-		"/C/Users/Will/Desktop/Red-Testing/cogs/downloader.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/downloader.py",
-		"/C/Users/Will/Desktop/Red-Testing/data/downloader/repos.json",
-		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/botinfo.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/main.py",
-		"/C/Users/Will/Desktop/Red-Testing/cogs/alias.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/rss.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/botinfo.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/customcom.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/mod.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/channellogger/channels.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/red/settings.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/utils/settings.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/mod/filter.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/alias.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/logger.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/red/discord.log",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/channellogger/155372302593163264/155372302593163264.log",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/customcom/commands.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/main.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/channellogger/133049272517001216/133251234164375552.log",
+		"/C/Users/Will/Desktop/Red-DiscordBot/data/alias/aliases.json",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/general.py",
+		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/economy.py",
+		"/C/Users/Will/Desktop/Red-Testing/cogs/downloader.py",
+		"/C/Users/Will/Desktop/Red-Testing/data/downloader/repos.json",
+		"/C/Users/Will/Desktop/Red-Testing/cogs/alias.py",
 		"/C/Users/Will/Desktop/discord.py/discord/ext/commands/core.py",
 		"/C/Users/Will/Desktop/Squid-Plugins/test/test.py",
 		"/C/Users/Will/Desktop/Red-Testing/cogs/test.py",
@@ -468,7 +503,6 @@
 		"/C/Users/Will/Desktop/discord.py/discord/state.py",
 		"/C/Users/Will/Desktop/discord.py/discord/object.py",
 		"/C/Users/Will/Desktop/discord.py/discord/ext/commands/__init__.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/data/mod/filter.json",
 		"/C/Users/Will/Desktop/Squid-DiscordBot/run.py",
 		"/C/Users/Will/Desktop/Red-Testing/data/red/Red.conf",
 		"/C/Users/Will/Desktop/Red-Testing/data/red/settings.json",
@@ -496,12 +530,10 @@
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/image.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/.gitignore",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/rules.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/general.py",
 		"/C/Users/Will/Desktop/Red-Testing/red.py",
 		"/C/Users/Will/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/ascii.py",
 		"/C/Users/Will/Desktop/Red-Testing/data/downloader/squid/test.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/alias.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/i18n.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/runescape/__init__.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/TODO.txt",
@@ -516,11 +548,8 @@
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/tickets.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/quotes.py",
 		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/customcom.py",
 		"/C/Users/Will/OneDrive/UC 2015-2016/ProgLang/soduko.sml",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/league.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/economy.py",
-		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/mod.py",
 		"/C/Users/Will/Desktop/Red-DiscordBot/cogs/karma/__init__.py",
 		"/C/Users/Will/Desktop/Squid-DiscordBot/logs/messages.log",
 		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/pluginutils/checks.py",
@@ -547,16 +576,7 @@
 		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/test_inject.py",
 		"/C/Users/Will/Desktop/Squid-DiscordBot/plugins/league.py",
 		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot/bot.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot/__init__.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/utils/__init__.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/questions.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/utils/python.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/i18n.py",
-		"/C/Users/Will/Desktop/Limnoria-master/src/plugin.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/shlex.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/utils/str.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/version.py",
-		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/ansi.py"
+		"/C/Users/Will/Desktop/Squid-DiscordBot/squid/bot/__init__.py"
 	],
 	"find":
 	{
@@ -574,6 +594,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"owner",
+			"OWNER",
+			"owner",
+			"8",
 			"name",
 			"repo_path",
 			"folder_path",
@@ -697,11 +721,7 @@
 			"maxlength",
 			"set_cog",
 			"list_cogs",
-			"reptracker",
-			"rep",
-			"RepTracker",
-			"help",
-			"Kappa"
+			"reptracker"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -760,6 +780,190 @@
 	"groups":
 	[
 		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19216,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18067,
+								18067
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content"
+							],
+							"syntax": "Packages/MagicPython/grammars/MagicPython.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11209.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "cogs/rss.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6405,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6363,
+								6363
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content"
+							],
+							"syntax": "Packages/MagicPython/grammars/MagicPython.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2793.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		},
+		{
 			"sheets":
 			[
 			]
@@ -782,11 +986,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
@@ -825,6 +1036,62 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"rss",
+				"cogs\\rss.py"
+			],
+			[
+				"downlo",
+				"cogs\\downloader.py"
+			],
+			[
+				"red/sett",
+				"data\\red\\settings.json"
+			],
+			[
+				"setting",
+				"cogs\\utils\\settings.py"
+			],
+			[
+				"main",
+				"main.py"
+			],
+			[
+				"filter",
+				"data\\mod\\filter.json"
+			],
+			[
+				"mod",
+				"cogs\\mod.py"
+			],
+			[
+				"alia",
+				"cogs\\alias.py"
+			],
+			[
+				"logger",
+				"data\\channellogger\\133049272517001216\\133251234164375552.log"
+			],
+			[
+				"channel",
+				"data\\channellogger\\133049272517001216\\133251234164375552.log"
+			],
+			[
+				"gener",
+				"cogs\\general.py"
+			],
+			[
+				"econ",
+				"cogs\\economy.py"
+			],
+			[
+				"custom",
+				"cogs\\customcom.py"
+			],
+			[
+				"botinf",
+				"cogs\\botinfo.py"
+			],
 			[
 				"repos",
 				"data\\downloader\\repos.json"

@@ -445,6 +445,8 @@ class Mod:
 
         if user.id == settings.owner:
             return True
+        elif message.channel.is_private:
+            return True
         elif discord.utils.get(user.roles, name=admin_role):
             return True
         elif discord.utils.get(user.roles, name=mod_role):
@@ -458,10 +460,9 @@ class Mod:
         server = message.server
         can_delete = message.channel.permissions_for(server.me).manage_messages
 
-        if message.author.id == self.bot.user.id or self.immune_from_filter(message) or not can_delete: # Owner, admins and mods are immune to the filter
-            return
-
         if server.id in self.filter.keys():
+            if message.author.id == self.bot.user.id or self.immune_from_filter(message) or not can_delete: # Owner, admins and mods are immune to the filter
+                return
             for w in self.filter[server.id]:
                 if w in message.content.lower():
                     try: # Something else in discord.py is throwing a 404 error after deletion

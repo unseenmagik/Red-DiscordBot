@@ -15,7 +15,7 @@ class ChannelLogger(object):
         self.channels = fileIO("data/channellogger/channels.json", "load")
 
     @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_messages=True)
+    @checks.is_owner()
     async def logger(self, ctx):
         """Toggles logging for a channel"""
         channel = ctx.message.channel
