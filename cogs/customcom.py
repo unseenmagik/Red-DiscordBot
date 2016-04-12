@@ -20,14 +20,7 @@ class CustomCommands:
         Example:
         !addcom yourcommand Text you want
         """
-        if len(text) == 0:
-            await send_cmd_help(ctx)
-            return
         server = ctx.message.server
-        content = ctx.message.content
-        chars = (len(ctx.prefix), len(ctx.invoked_with), len(command))
-        # Gets text of the command
-        text = content[chars[0] + chars[1] + chars[2] + 2:]
         command = command.lower()
         if command in self.bot.commands.keys():
             await self.bot.say("That command is already a standard command.")
@@ -52,14 +45,7 @@ class CustomCommands:
         Example:
         !editcom yourcommand Text you want
         """
-        if len(text) == 0:
-            await send_cmd_help(ctx)
-            return
         server = ctx.message.server
-        content = ctx.message.content
-        chars = (len(ctx.prefix), len(ctx.invoked_with), len(command))
-        # Gets text of the command
-        text = content[chars[0] + chars[1] + chars[2] + 2:]
         command = command.lower()
         if server.id in self.c_commands:
             cmdlist = self.c_commands[server.id]

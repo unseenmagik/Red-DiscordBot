@@ -277,8 +277,8 @@ async def prefix(*prefixes):
     if prefixes == ():
         await bot.say("Example: setprefix [ ! ^ .")
         return
-    bot.command_prefix = list(prefixes)
-    settings.prefixes = list(prefixes)
+    bot.command_prefix = sorted(prefixes, reverse=True)
+    settings.prefixes = sorted(prefixes, reverse=True)
     if len(prefixes) > 1:
         await bot.say("Prefixes set")
     else:
@@ -472,8 +472,8 @@ def check_configs():
             new_prefix = input("Prefix> ")
             if new_prefix.lower() != "exit" and new_prefix != "":
                 prefixes.append(new_prefix)
-                # Remember we're using property's here, oh well...
-        settings.prefixes = prefixes
+                #Remember we're using property's here, oh well...
+        settings.prefixes = sorted(prefixes, reverse=True)
 
         print(
             "\nIf you know what an User ID is, input *your own*"
