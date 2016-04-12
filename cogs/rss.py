@@ -146,6 +146,31 @@ class RSS(object):
         else:
             await self.bot.say('Feed not found!')
 
+    @rss.command(pass_context=True, name="force")
+    async def _rss_force(self, ctx, feed_name: str):
+        server = ctx.message.server
+        channel = ctx.message.channel
+        feeds = self.feeds.get_copy()
+        if server.id not in feeds:
+            return
+        if channel.id not in feeds[server.id]:
+            return
+        if feed_name not in feeds[server.id][channel.id]:
+            await self.bot.say("That feedname doesn't exist.")
+            return
+
+        items = feeds[server.id][channel.id][feed_name].copy()
+        url = items['url']
+        template = items['template']
+        rss = feedparser.parse(url)
+        latest = rss.entries[0]
+        to_fill = string.Template(template)
+        message = to_fill.safe_substitute(
+            name=bold(feed_name),
+            **latest
+        )
+        await self.bot.say(message)
+
     @rss.command(pass_context=True, name="remove")
     async def _rss_remove(self, ctx, name: str):
         success = await self.feeds.delete_feed(ctx, name)
