@@ -1,9 +1,7 @@
-import discord
 from discord.ext import commands
 from cogs.utils import checks
 from cogs.utils.chat_formatting import *
 from cogs.utils.dataIO import fileIO
-from cogs.utils import checks
 from __main__ import send_cmd_help
 import os
 
@@ -26,12 +24,13 @@ class Alias:
 
            Example: !alias add test flip @Twentysix"""
         server = ctx.message.server
-        prefix = self.get_prefix(to_execute)
-        base_command = to_execute[len(prefix):].split(" ")[0]
-        if prefix:
-            await self.bot.say(("'{}' is not a".format(prefix+base_command)) +
-                               " valid command to alias!")
+        if self.part_of_existing_command(command, server.id):
+            await self.bot.say('I can\'t safely add an alias that starts with '
+                               'an existing command or alias. Sry <3')
             return
+        prefix = self.get_prefix(to_execute)
+        if prefix is not None:
+            to_execute = to_execute[len(prefix):]
         if server.id not in self.aliases:
             self.aliases[server.id] = {}
         if command not in self.bot.commands:
@@ -39,7 +38,8 @@ class Alias:
             fileIO("data/alias/aliases.json", "save", self.aliases)
             await self.bot.say("Alias '{}' added.".format(command))
         else:
-            await self.bot.say("Cannot add '{}' because it's a real bot command.".format(command))
+            await self.bot.say("Cannot add '{}' because it's a real bot "
+                               "command.".format(command))
 
     @alias.command(name="help", pass_context=True)
     async def _help_alias(self, ctx, command):
@@ -90,14 +90,31 @@ class Alias:
         prefix = self.get_prefix(msg)
 
         if prefix and server.id in self.aliases:
-            aliaslist = self.aliases[server.id]
-            alias = msg[len(prefix):].split(" ")[0]
-            args = msg[len(self.first_word(message.content)):]
-            if alias in aliaslist.keys():
-                content = aliaslist[alias] + args
-                new_message = message
-                new_message.content = content
-                await self.bot.process_commands(new_message)
+            for alias in self.aliases[server.id]:
+                if msg[len(prefix):].startswith(alias):
+                    new_command = self.aliases[server.id][alias]
+                    args = message.content[len(prefix+alias):]
+                    message.content = prefix + new_command + args
+                    await self.bot.process_commands(message)
+
+    def part_of_existing_command(self, alias, server):
+        '''Command or alias'''
+        for command in self.bot.commands:
+            if alias.startswith(command):
+                return True
+        if server not in self.aliases:
+            return False
+        if alias.split(" ")[0] in self.aliases[server]:
+            return True
+        return False
+
+    def remove_old(self):
+        for sid in self.aliases:
+            for aliasname, alias in self.aliases[sid].items():
+                prefix = self.get_prefix(alias)
+                if prefix is not None:
+                    self.aliases[sid][aliasname] = alias[len(prefix):]
+        fileIO("data/alias/aliases.json", "save", self.aliases)
 
     def first_word(self, msg):
         return msg.split(" ")[0]
@@ -106,7 +123,7 @@ class Alias:
         for p in self.bot.command_prefix:
             if msg.startswith(p):
                 return p
-        return False
+        return None
 
 
 def check_folder():
@@ -128,5 +145,6 @@ def setup(bot):
     check_folder()
     check_file()
     n = Alias(bot)
+    n.remove_old()
     bot.add_listener(n.check_aliases, "on_message")
     bot.add_cog(n)
