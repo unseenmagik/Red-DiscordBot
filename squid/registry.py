@@ -39,9 +39,8 @@ import json
 import codecs
 import string
 import textwrap
-from . import utils, i18n
+from . import utils
 from .utils import minisix
-_ = i18n.PluginInternationalization()
 
 def error(s):
    """Replace me with something better from another module!"""
@@ -225,7 +224,6 @@ class Group(object):
 
     def __makeChild(self, attr, s):
         v = self.__class__(self._default, self._help)
-        print("-----7",type(attr))
         v.set(s)
         v.__class__ = self.X
         v._supplyDefault = False
@@ -254,11 +252,9 @@ class Group(object):
 
     def setName(self, name):
         #print '***', name
-        print("-----10")
         self._name = name
         if name in _cache and self._lastModified < _lastModified:
             #print '***>', _cache[name]
-            print("-----11",name,_cache[name])
             self.set(_cache[name])
         if self._supplyDefault:
             for (k, v) in _cache.items():
@@ -434,7 +430,7 @@ class Value(Group):
 
 class Boolean(Value):
     """Value must be either True or False (or On or Off)."""
-    errormsg = _('Value must be either True or False (or On or Off), not %r.')
+    errormsg = ('Value must be either True or False (or On or Off), not %r.')
     def set(self, s):
         try:
             v = utils.str.toBool(s)
@@ -450,7 +446,7 @@ class Boolean(Value):
 
 class Integer(Value):
     """Value must be an integer."""
-    errormsg = _('Value must be an integer, not %r.')
+    errormsg = ('Value must be an integer, not %r.')
     def set(self, s):
         try:
             self.setValue(int(s))
@@ -459,7 +455,7 @@ class Integer(Value):
 
 class NonNegativeInteger(Integer):
     """Value must be a non-negative integer."""
-    errormsg = _('Value must be a non-negative integer, not %r.')
+    errormsg = ('Value must be a non-negative integer, not %r.')
     def setValue(self, v):
         if v < 0:
             self.error(v)
@@ -467,7 +463,7 @@ class NonNegativeInteger(Integer):
 
 class PositiveInteger(NonNegativeInteger):
     """Value must be positive (non-zero) integer."""
-    errormsg = _('Value must be positive (non-zero) integer, not %r.')
+    errormsg = ('Value must be positive (non-zero) integer, not %r.')
     def setValue(self, v):
         if not v:
             self.error(v)
@@ -475,7 +471,7 @@ class PositiveInteger(NonNegativeInteger):
 
 class Float(Value):
     """Value must be a floating-point number."""
-    errormsg = _('Value must be a floating-point number, not %r.')
+    errormsg = ('Value must be a floating-point number, not %r.')
     def set(self, s):
         try:
             self.setValue(float(s))
@@ -490,7 +486,7 @@ class Float(Value):
 
 class PositiveFloat(Float):
     """Value must be a floating-point number greater than zero."""
-    errormsg = _('Value must be a floating-point number greater than zero, '
+    errormsg = ('Value must be a floating-point number greater than zero, '
             'not %r.')
     def setValue(self, v):
         if v <= 0:
@@ -500,7 +496,7 @@ class PositiveFloat(Float):
 
 class Probability(Float):
     """Value must be a floating point number in the range [0, 1]."""
-    errormsg = _('Value must be a floating point number in the range [0, 1], '
+    errormsg = ('Value must be a floating point number in the range [0, 1], '
             'not %r.')
     def __init__(self, *args, **kwargs):
         self.__parent = super(Probability, self)
@@ -514,7 +510,7 @@ class Probability(Float):
 
 class String(Value):
     """Value is not a valid Python string."""
-    errormsg = _('Value is not a valid Python string, not %r.')
+    errormsg = ('Value is not a valid Python string, not %r.')
     def set(self, s):
         v = s
         if not v:
@@ -546,9 +542,9 @@ class OnlySomeStrings(String):
                                   'This is a bug.'
         self.__parent = super(OnlySomeStrings, self)
         self.__parent.__init__(*args, **kwargs)
-        self.__doc__ = _('Valid values include {}.').format(
+        self.__doc__ = ('Valid values include {}.').format(
                               self.validStrings)
-        self.errormsg = _('Valid values include %L, not %%r.').format(
+        self.errormsg = ('Valid values include %L, not %%r.').format(
                               self.validStrings)
 
     def help(self):
@@ -619,7 +615,7 @@ class StringWithSpaceOnRight(String):
 
 class Regexp(Value):
     """Value must be a valid regular expression."""
-    errormsg = _('Value must be a valid regular expression, not %r.')
+    errormsg = ('Value must be a valid regular expression, not %r.')
     def __init__(self, *args, **kwargs):
         kwargs['setDefault'] = False
         self.sr = ''

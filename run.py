@@ -136,8 +136,6 @@ if __name__ == '__main__':
 
     if not os.path.exists(conf.squidbot.directories.log()):
         os.mkdir(conf.squidbot.directories.log())
-    if not os.path.exists(conf.squidbot.directories.conf()):
-        os.mkdir(conf.squidbot.directories.conf())
     if not os.path.exists(conf.squidbot.directories.data()):
         os.mkdir(conf.squidbot.directories.data())
     if not os.path.exists(conf.squidbot.directories.data.tmp()):

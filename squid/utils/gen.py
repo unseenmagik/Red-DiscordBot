@@ -44,7 +44,6 @@ from . import crypt
 from .str import format
 from .file import mktemp
 from . import minisix
-from . import internationalization as _
 
 def warn_non_constant_time(f):
     @functools.wraps(f)
@@ -109,23 +108,23 @@ def timeElapsed(elapsed, short=False, leadingZeroes=False, years=True,
            hours or minutes or seconds, 'One flag must be True'
     if years:
         (yrs, elapsed) = (elapsed // 31536000, elapsed % 31536000)
-        Format(_('year'), yrs)
+        Format(('year'), yrs)
     if weeks:
         (wks, elapsed) = (elapsed // 604800, elapsed % 604800)
-        Format(_('week'), wks)
+        Format(('week'), wks)
     if days:
         (ds, elapsed) = (elapsed // 86400, elapsed % 86400)
-        Format(_('day'), ds)
+        Format(('day'), ds)
     if hours:
         (hrs, elapsed) = (elapsed // 3600, elapsed % 3600)
-        Format(_('hour'), hrs)
+        Format(('hour'), hrs)
     if minutes or seconds:
         (mins, secs) = (elapsed // 60, elapsed % 60)
         if leadingZeroes or mins:
-            Format(_('minute'), mins)
+            Format(('minute'), mins)
         if seconds:
             leadingZeroes = True
-            Format(_('second'), secs)
+            Format(('second'), secs)
     if not ret:
         raise ValueError('Time difference not great enough to be noted.')
     result = ''
@@ -134,7 +133,7 @@ def timeElapsed(elapsed, short=False, leadingZeroes=False, years=True,
     else:
         result = format('%L', ret)
     if before:
-        result = _('%s ago') % result
+        result = ('%s ago') % result
     return result
 
 def findBinaryInPath(s):
@@ -247,7 +246,6 @@ class IterableMap(object):
         for __ in self.items():
             return True
         return False
-    __nonzero__ = __bool__
 
 
 class InsensitivePreservingDict(collections.MutableMapping):
@@ -301,7 +299,7 @@ class InsensitivePreservingDict(collections.MutableMapping):
             L.append(k)
         return L
 
-    def __reduce__(self):
+    def __reduce___(self):
         return (self.__class__, (dict(self.data.values()),))
 
 

@@ -57,10 +57,6 @@ def force(x):
         return x
 builtins['force'] = force
 
-#internationalization = builtins.get('supybotInternationalization', None)
-from ..i18n import PluginInternationalization
-internationalization = PluginInternationalization()
-
 # These imports need to happen below the block above, so things get put into
 # __builtins__ appropriately.
 from .gen import *

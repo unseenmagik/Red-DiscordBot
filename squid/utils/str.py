@@ -42,9 +42,6 @@ from . import minisix
 from .iter import any
 from .structures import TwoWayDictionary
 
-from . import internationalization as _
-internationalizeFunction = _.internationalizeFunction
-
 try:
     from charade.universaldetector import UniversalDetector
     charadeLoaded = True
@@ -355,7 +352,6 @@ def matchCase(s1, s2):
                 L[i] = L[i].upper()
         return ''.join(L)
 
-@internationalizeFunction('pluralize')
 def pluralize(s):
     """Returns the plural of s.  Put any exceptions to the general English
     rule of appending 's' in the plurals dictionary.
@@ -378,7 +374,6 @@ def pluralize(s):
     else:
         return matchCase(s, s+'s')
 
-@internationalizeFunction('depluralize')
 def depluralize(s):
     """Returns the singular of s."""
     consonants = 'bcdfghjklmnpqrstvwxz'
@@ -432,7 +427,6 @@ def nItems(n, item, between=None):
         else:
             return format('%s %s %s', n, between, item)
 
-@internationalizeFunction('ordinal')
 def ordinal(i):
     """Returns i + the ordinal indicator for the number.
 
@@ -451,7 +445,6 @@ def ordinal(i):
         ord = 'rd'
     return '%s%s' % (i, ord)
 
-@internationalizeFunction('be')
 def be(i):
     """Returns the form of the verb 'to be' based on the number i."""
     if i == 1:
@@ -459,7 +452,6 @@ def be(i):
     else:
         return 'are'
 
-@internationalizeFunction('has')
 def has(i):
     """Returns the form of the verb 'to have' based on the number i."""
     if i == 1:

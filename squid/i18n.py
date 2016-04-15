@@ -53,23 +53,23 @@ class PluginNotFound(Exception):
     pass
 
 def getLocaleFromRegistryFilename(filename):
-    """Called by the 'squidbot' script. Gets the locale name before conf is
+    """Called by the 'supybot' script. Gets the locale name before conf is
     loaded."""
     global currentLocale
     with open(filename, 'r') as fd:
         for line in fd:
-            if line.startswith('squidbot.language: '):
-                currentLocale = line[len('squidbot.language: '):]
+            if line.startswith('supybot.language: '):
+                currentLocale = line[len('supybot.language: '):]
 
 def import_conf():
     """Imports the conf into this module"""
     global conf
-    conf = __import__('squid.conf').conf
-    conf.registerGlobalValue(conf.squidbot, 'language',
+    conf = __import__('supybot.conf').conf
+    conf.registerGlobalValue(conf.supybot, 'language',
         conf.registry.String(currentLocale, """Determines the bot's default
         language if translations exist. Currently supported are 'de', 'en',
         'es', 'fi', 'fr' and 'it'."""))
-    conf.squidbot.language.addCallback(reloadLocalesIfRequired)
+    conf.supybot.language.addCallback(reloadLocalesIfRequired)
 
 def getPluginDir(plugin_name):
     """Gets the directory of the given plugin"""
@@ -80,7 +80,7 @@ def getPluginDir(plugin_name):
         pass
     if filename == None:
         try:
-            filename = sys.modules['squidbot.plugins.' + plugin_name].__file__
+            filename = sys.modules['supybot.plugins.' + plugin_name].__file__
         except: # In the case where the plugin is not loaded by Supybot
             try:
                 filename = sys.modules['plugin'].__file__
@@ -96,14 +96,17 @@ def getPluginDir(plugin_name):
     raise PluginNotFound()
 
 def getLocalePath(name, localeName, extension):
-    """Gets the path of the locale file of the given plugin ('squidbot' stands
+    """Gets the path of the locale file of the given plugin ('supybot' stands
     for the core)."""
-    if name != 'squidbot':
+    '''if name != 'supybot':
         base = getPluginDir(name)
     else:
         from . import ansi # Any Supybot plugin could fit
-        base = ansi.__file__[0:-len('ansi.pyc')]
-    directory = os.path.join(base, 'locales')
+        base = ansi.__file__[0:-len('ansi.pyc')]'''
+    base = 'cogs/locales'
+    if name.endswith('py'):
+        name = name[:-3]
+    directory = os.path.join(base, name)
     return '%s/%s.%s' % (directory, localeName, extension)
 
 i18nClasses = weakref.WeakValueDictionary()
@@ -114,8 +117,8 @@ def reloadLocalesIfRequired():
     global currentLocale
     if conf is None:
         return
-    if currentLocale != conf.squidbot.language():
-        currentLocale = conf.squidbot.language()
+    if currentLocale != conf.supybot.language():
+        currentLocale = conf.supybot.language()
         reloadLocales()
 
 def reloadLocales():
@@ -127,12 +130,10 @@ def reloadLocales():
         function.loadLocale()
 
 def normalize(string, removeNewline=False):
-    import squid.utils as utils
     string = string.replace('\\n\\n', '\n\n')
     string = string.replace('\\n', ' ')
     string = string.replace('\\"', '"')
     string = string.replace("\'", "'")
-    string = utils.str.normalizeWhitespace(string, removeNewline)
     string = string.strip('\n')
     string = string.strip('\t')
     return string
@@ -191,7 +192,7 @@ def parse(translationFile):
 
 
 i18nSupybot = None
-def PluginInternationalization(name='squidbot'):
+def PluginInternationalization(name='supybot'):
     # This is a proxy that prevents having several objects for the same plugin
     if name in i18nClasses:
         return i18nClasses[name]
@@ -200,7 +201,7 @@ def PluginInternationalization(name='squidbot'):
 
 class _PluginInternationalization:
     """Internationalization managment for a plugin."""
-    def __init__(self, name='squidbot'):
+    def __init__(self, name='supybot'):
         self.name = name
         self.translations = {}
         self.currentLocaleName = None
@@ -232,7 +233,6 @@ class _PluginInternationalization:
 
     def _parse(self, translationFile):
         """A .po files parser.
-
         Give it a file object."""
         self.translations = {}
         for translation in parse(translationFile):
@@ -246,7 +246,6 @@ class _PluginInternationalization:
 
     def __call__(self, untranslated):
         """Main function.
-
         This is the function which is called when a plugin runs _()"""
         normalizedUntranslated = normalize(untranslated, True)
         try:
@@ -261,7 +260,6 @@ class _PluginInternationalization:
 
     def _translate(self, string):
         """Translate the string.
-
         C the string internationalizer if any; else, use the local database"""
         if string.__class__ == InternationalizedString:
             return string._internationalizer(string.untranslated)
@@ -282,7 +280,7 @@ class _PluginInternationalization:
     def _loadL10nCode(self):
         """Open the file containing the code specific to this locale, and
         load its functions."""
-        if self.name != 'squidbot':
+        if self.name != 'supybot':
             return
         path = self._getL10nCodePath()
         try:
@@ -298,18 +296,16 @@ class _PluginInternationalization:
 
     def _getL10nCodePath(self):
         """Returns the path to the code localization file.
-
         It contains functions that needs to by fully (code + strings)
         localized"""
-        if self.name != 'squidbot':
+        if self.name != 'supybot':
             return
-        return getLocalePath('squidbot', self.currentLocaleName, 'py')
+        return getLocalePath('supybot', self.currentLocaleName, 'py')
 
     def localizeFunction(self, name):
         """Returns the localized version of the function.
-
         Should be used only by the InternationalizedFunction class"""
-        if self.name != 'squidbot':
+        if self.name != 'supybot':
             return
         if hasattr(self, '_l10nFunctions') and \
                 name in self._l10nFunctions:
@@ -317,9 +313,8 @@ class _PluginInternationalization:
 
     def internationalizeFunction(self, name):
         """Decorates functions and internationalize their code.
-
         Only useful for Supybot core functions"""
-        if self.name != 'squidbot':
+        if self.name != 'supybot':
             return
         class FunctionInternationalizer:
             def __init__(self, parent, name):
@@ -333,7 +328,6 @@ class _PluginInternationalization:
 
 class InternationalizedFunction:
     """Proxy for functions that need to be fully localized.
-
     The localization code is in locales/LOCALE.py"""
     def __init__(self, internationalizer, name, function):
         self._internationalizer = internationalizer
@@ -366,7 +360,6 @@ except TypeError:
 
 def internationalizeDocstring(obj):
     """Decorates functions and internationalize their docstring.
-
     Only useful for commands (commands' docstring is displayed on IRC)"""
     if obj.__doc__ == None:
         return obj
