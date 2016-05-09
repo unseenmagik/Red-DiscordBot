@@ -158,7 +158,7 @@ class General:
         await self.bot.say(msg)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def info(self, ctx, user : discord.Member = None):
+    async def userinfo(self, ctx, user : discord.Member = None):
         """Shows users's informations"""
         author = ctx.message.author
         if not user:

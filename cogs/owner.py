@@ -330,9 +330,9 @@ class Owner:
         else:
             await self.bot.say("Ok I'll stay here then.")
 
-    @commands.command(pass_context=True)
+    @commands.command(enabled=False, pass_context=True)
     @checks.is_owner()
-    async def servers(self, ctx):
+    async def serverlist(self, ctx):
         """Lists and allows to leave servers"""
         owner = ctx.message.author
         servers = list(self.bot.servers)
