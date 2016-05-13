@@ -184,12 +184,12 @@ class Downloader(threading.Thread):
             video = self._yt.extract_info(self.url, download=False,
                                           process=False)
         else:
-            self.url = self.url[9:]
-            yt_id = self._yt.extract_info(self.url,
-                download=False)["entries"][0]["id"] # Should handle errors here.
-            self.url = "https://youtube.com/watch?v={}".format(yt_id)
             video = self._yt.extract_info(self.url, download=False,
                                           process=False)
+            self.url = "https://youtube.com/watch?v={}".format(
+                video["entries"][0]["id"])
+
+            video.url = self.url
 
         self.song = Song(**video)
 
@@ -469,20 +469,6 @@ class Audio:
         except AttributeError:
             pass
 
-    def _list_playlists(self, server):
-        try:
-            server = server.id
-        except:
-            pass
-        path = "data/audio/playlists"
-        old_playlists = [f[:-4] for f in os.listdir(path) if f.endswith(".txt")]
-        path = os.path.join(path, server)
-        if os.path.exists(path):
-            new_playlists = [f[:-4] for f in os.listdir(path) if f.endswith(".txt")]
-        else:
-            new_playlists = []
-        return list(set(old_playlists + new_playlists))
-
     def _list_local_playlists(self):
         ret = []
         for thing in os.listdir(self.local_playlist_path):
@@ -490,6 +476,22 @@ class Audio:
                 ret.append(thing)
         log.debug("local playlists:\n\t{}".format(ret))
         return ret
+
+    def _list_playlists(self, server):
+        try:
+            server = server.id
+        except:
+            pass
+        path = "data/audio/playlists"
+        old_playlists = [f[:-4] for f in os.listdir(path)
+                         if f.endswith(".txt")]
+        path = os.path.join(path, server)
+        if os.path.exists(path):
+            new_playlists = [f[:-4] for f in os.listdir(path)
+                             if f.endswith(".txt")]
+        else:
+            new_playlists = []
+        return list(set(old_playlists + new_playlists))
 
     def _load_playlist(self, server, name, local=True):
         try:
@@ -611,7 +613,7 @@ class Audio:
         assert type(server) is discord.Server
         log.debug('starting to play on "{}"'.format(server.name))
 
-        if self._valid_playable_url(url) or "[SEARCH:]" in url:
+        if self._valid_playable_url(url):
             song = await self._guarantee_downloaded(server, url)
             local = False
         else:  # Assume local
@@ -1028,10 +1030,16 @@ class Audio:
         author = ctx.message.author
         voice_channel = author.voice_channel
 
+        # Checking if playing in current server
+
+        if self.is_playing(server):
+            await self.bot.say("I'm already playing a song on this server!")
+            return  # TODO: Possibly execute queue?
+
         # Checking already connected, will join if not
-        
+
         caller = inspect.currentframe().f_back.f_code.co_name
-        
+
         if not self.voice_connected(server):
             try:
                 can_connect = self.has_connect_perm(author, server)
@@ -1049,27 +1057,21 @@ class Audio:
                 await self._stop_and_disconnect(server)
                 await self._join_voice_channel(voice_channel)
 
-        # Checking if playing in current server
-
-        if self.is_playing(server):
-            await self.bot.say("I'm already playing a song on this server!")
-            return  # TODO: Possibly execute queue?
-
         # If not playing, spawn a downloader if it doesn't exist and begin
         #   downloading the next song
 
         if self.currently_downloading(server):
             await self.bot.say("I'm already downloading a file!")
             return
-        
-        if caller != "yt_search":
-            if not self._valid_playable_url(url):
-                await self.bot.say("That's not a valid URL.")
-                return
-        else:
+
+        if caller == "yt_search":
             url = "[SEARCH:]" + url
-        self._clear_queue(server)
+        elif not self._valid_playable_url(url):
+            await self.bot.say("That's not a valid URL.")
+            return
+
         self._stop_player(server)
+        self._clear_queue(server)
         self._add_to_queue(server, url)
 
     @commands.command(pass_context=True, no_pm=True)
@@ -1101,19 +1103,6 @@ class Audio:
             await self.bot.say("Going back 1 song.")
         else:
             await self.bot.say("Not playing anything on this server.")
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def sing(self, ctx):
-        """Makes Red sing one of her songs"""
-        ids = ("zGTkAVsrfg8", "cGMWL8cOeAU", "vFrjMq4aL-g", "WROI5WYBU_A", 
-               "41tIUr_ex3g", "f9O2Rjn1azc")
-        url = "https://www.youtube.com/watch?v={}".format(choice(ids))
-        await self.play.callback(self, ctx, url)
-
-    @commands.command(name="yt", pass_context=True, no_pm=True)
-    async def yt_search(self, ctx, *, search_terms : str):
-        """Searches and plays a video from YouTube"""
-        await self.play.callback(self, ctx, search_terms)
 
     @commands.group(pass_context=True, no_pm=True)
     async def playlist(self, ctx):
@@ -1232,6 +1221,7 @@ class Audio:
                                                server, name))
             if caller == "playlist_start_mix":
                 shuffle(playlist.playlist)
+
             self._play_playlist(server, playlist)
             await self.bot.say("Playlist queued.")
         else:
@@ -1354,6 +1344,14 @@ class Audio:
             await self.bot.say("Can't skip if I'm not playing.")
 
     @commands.command(pass_context=True, no_pm=True)
+    async def sing(self, ctx):
+        """Makes Red sing one of her songs"""
+        ids = ("zGTkAVsrfg8", "cGMWL8cOeAU", "vFrjMq4aL-g", "WROI5WYBU_A",
+               "41tIUr_ex3g", "f9O2Rjn1azc")
+        url = "https://www.youtube.com/watch?v={}".format(choice(ids))
+        await self.play.callback(self, ctx, url)
+
+    @commands.command(pass_context=True, no_pm=True)
     async def song(self, ctx):
         """Info about the current song."""
         server = ctx.message.server
@@ -1361,8 +1359,9 @@ class Audio:
             song = self.queue[server.id]["NOW_PLAYING"]
             if song:
                 msg = ("\n**Title:** {}\n**Author:** {}\n**Uploader:** {}\n"
-                "**Views:** {}\n\n<{}>".format(song.title, song.creator, 
-                    song.uploader, song.view_count, song.webpage_url))
+                       "**Views:** {}\n\n<{}>".format(
+                           song.title, song.creator, song.view_count,
+                           song.webpage_url))
                 await self.bot.say(msg.replace("**Author:** None\n", ""))
             else:
                 await self.bot.say("I don't know what this song is either.")
@@ -1376,6 +1375,12 @@ class Audio:
         server = ctx.message.server
 
         self._stop(server)
+
+    @commands.command(name="yt", pass_context=True, no_pm=True)
+    async def yt_search(self, ctx, *, search_terms: str):
+        """Searches and plays a video from YouTube"""
+        await self.bot.say('This got broken. Will be fixed soon.')
+        # await self.play.callback(self, ctx, search_terms)
 
     def is_playing(self, server):
         if not self.voice_connected(server):
@@ -1455,8 +1460,8 @@ class Audio:
                 ret[setting] = self.settings[setting]
                 if setting.lower() == "volume" and ret[setting] <= 1:
                     ret[setting] *= 100
-        #^This will make it so that only users with an outdated config will
-        #have their volume set * 100. In theory.
+        # ^This will make it so that only users with an outdated config will
+        # have their volume set * 100. In theory.
         self.save_settings()
 
         return ret
