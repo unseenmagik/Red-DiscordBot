@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 from cogs.utils.settings import Settings
+from cogs.utils.dataIO import dataIO
 import json
 import asyncio
 import os
@@ -150,17 +151,11 @@ def check_folders():
 def check_configs():
     if settings.bot_settings == settings.default_settings:
         print("Red - First run configuration\n")
-        print("You either need a normal account or a bot account to use Red. "
-              "*Do not* use your own.")
-        print("For more information on bot accounts see: https://twentysix26."
-              "github.io/Red-Docs/red_guide_bot_accounts/"
+        print("If you haven't already, create a new account:\n"
+              "https://twentysix26.github.io/Red-Docs/red_guide_bot_accounts/"
               "#creating-a-new-bot-account")
-        print("If you decide to use a normal account, create an account for "
-              "your bot on https://discordapp.com then enter your email here.")
-        print("Otherwise make a bot account and copy the token from "
-              "https://discordapp.com/developers/applications/me then enter "
-              "your token here.")
-        print("\nType your email or token:")
+        print("and obtain your bot's token like described.")
+        print("\nInsert your bot's token:")
 
         choice = input("> ")
 
@@ -215,12 +210,9 @@ def check_configs():
         if settings.default_mod == "":
             settings.default_mod = "Process"
 
-    cogs_s_path = "data/red/cogs.json"
-    cogs = {}
-    if not os.path.isfile(cogs_s_path):
+    if not os.path.isfile("data/red/cogs.json"):
         print("Creating new cogs.json...")
-        with open(cogs_s_path, "w") as f:
-            f.write(json.dumps(cogs))
+        dataIO.save_json("data/red/cogs.json", {})
 
 
 def set_logger():
@@ -268,12 +260,9 @@ def get_answer():
 
 
 def set_cog(cog, value):
-    with open('data/red/cogs.json', "r") as f:
-        data = json.load(f)
+    data = dataIO.load_json("data/red/cogs.json")
     data[cog] = value
-    with open('data/red/cogs.json', "w") as f:
-        f.write(json.dumps(data))
-
+    dataIO.save_json("data/red/cogs.json", data)
 
 def load_cogs():
     try:
@@ -285,8 +274,7 @@ def load_cogs():
         no_prompt = False
 
     try:
-        with open('data/red/cogs.json', "r") as f:
-            registry = json.load(f)
+        registry = dataIO.load_json("data/red/cogs.json")
     except:
         registry = {}
 
@@ -325,8 +313,7 @@ def load_cogs():
             registry[extension] = False
 
     if extensions:
-        with open('data/red/cogs.json', "w") as f:
-            f.write(json.dumps(registry))
+        dataIO.save_json("data/red/cogs.json", registry)
 
     if failed:
         print("\nFailed to load: ", end="")

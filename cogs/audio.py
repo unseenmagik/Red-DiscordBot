@@ -70,6 +70,14 @@ class AuthorNotConnected(NotConnected):
 class VoiceNotConnected(NotConnected):
     pass
 
+class UnauthorizedConnect(Exception):
+    pass
+
+class UnauthorizedSpeak(Exception):
+    pass
+
+class UnauthorizedSave(Exception):
+    pass
 
 class ConnectTimeout(NotConnected):
     pass
@@ -113,12 +121,15 @@ class Song:
 
 class Playlist:
     def __init__(self, server=None, sid=None, name=None, author=None, url=None,
-                 playlist=None, **kwargs):
+                 playlist=None, path=None, main_class=None, **kwargs):
         self.server = server
         self._sid = sid
         self.name = name
         self.author = author
         self.url = url
+        self.main_class = main_class # reference to Audio
+        self.path = path
+
         if url is None and "link" in kwargs:
             self.url = kwargs.get('link')
         self.playlist = playlist
@@ -133,6 +144,18 @@ class Playlist:
         ret = {"author": self.author, "playlist": self.playlist,
                "link": self.url}
         return ret
+
+    def append_song(self, author, url):
+        if author.id != self.author:
+            raise UnauthorizedSave
+        elif not self.main_class._valid_playable_url(url):
+            raise InvalidURL
+        else:
+            self.playlist.append(url)
+            self.save()
+
+    def save(self):
+        fileIO(self.path, "save", self.to_json())
 
     @property
     def sid(self):
@@ -184,12 +207,12 @@ class Downloader(threading.Thread):
             video = self._yt.extract_info(self.url, download=False,
                                           process=False)
         else:
+            self.url = self.url[9:]
+            yt_id = self._yt.extract_info(self.url,
+                download=False)["entries"][0]["id"] # Should handle errors here.
+            self.url = "https://youtube.com/watch?v={}".format(yt_id)
             video = self._yt.extract_info(self.url, download=False,
                                           process=False)
-            self.url = "https://youtube.com/watch?v={}".format(
-                video["entries"][0]["id"])
-
-            video.url = self.url
 
         self.song = Song(**video)
 
@@ -308,6 +331,8 @@ class Audio:
             voice_client.audio_player.process.kill()
             log.debug("killed old player")
         except AttributeError:
+            pass
+        except ProcessLookupError:
             pass
 
         log.debug("making player on sid {}".format(server.id))
@@ -468,6 +493,8 @@ class Audio:
             self.voice_client(server).audio_player.process.kill()
         except AttributeError:
             pass
+        except ProcessLookupError:
+            pass
 
     def _list_local_playlists(self):
         ret = []
@@ -506,6 +533,8 @@ class Audio:
             f = os.path.join(f, name + ".txt")
         kwargs = fileIO(f, 'load')
 
+        kwargs['path'] = f
+        kwargs['main_class'] = self
         kwargs['name'] = name
         kwargs['sid'] = server
 
@@ -575,11 +604,13 @@ class Audio:
             await asyncio.sleep(0.5)
 
         for entry in d.song.entries:
-            if entry.url[4] != "s":
-                song_url = "https{}".format(entry.url[4:])
+            if entry["url"][4] != "s":
+                song_url = "https{}".format(entry["url"][4:])
                 playlist.append(song_url)
             else:
                 playlist.append(entry.url)
+
+        return playlist
 
     async def _parse_yt_playlist(self, url):
         d = Downloader(url)
@@ -613,7 +644,7 @@ class Audio:
         assert type(server) is discord.Server
         log.debug('starting to play on "{}"'.format(server.name))
 
-        if self._valid_playable_url(url):
+        if self._valid_playable_url(url) or "[SEARCH:]" in url:
             song = await self._guarantee_downloaded(server, url)
             local = False
         else:  # Assume local
@@ -974,9 +1005,14 @@ class Audio:
                 await self.bot.say("You must join a voice channel before I can"
                                    " play anything.")
                 return
-            if not can_connect:
+            except UnauthorizedConnect:
                 await self.bot.say("I don't have permissions to join your"
                                    " voice channel.")
+                return
+            except UnauthorizedSpeak:
+                await self.bot.say("I don't have permissions to speak in your"
+                                   " voice channel.")
+                return
             else:
                 await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel
@@ -1024,8 +1060,9 @@ class Audio:
             await self.bot.say("Nothing playing, nothing to pause.")
 
     @commands.command(pass_context=True, no_pm=True)
-    async def play(self, ctx, url):
-        """Plays a song"""
+    async def play(self, ctx, *, url_or_search_terms):
+        """Plays a link / searches and play"""
+        url = url_or_search_terms
         server = ctx.message.server
         author = ctx.message.author
         voice_channel = author.voice_channel
@@ -1033,8 +1070,8 @@ class Audio:
         # Checking if playing in current server
 
         if self.is_playing(server):
-            await self.bot.say("I'm already playing a song on this server!")
-            return  # TODO: Possibly execute queue?
+            await ctx.invoke(self._queue, url=url)
+            return  # Default to queue
 
         # Checking already connected, will join if not
 
@@ -1047,9 +1084,14 @@ class Audio:
                 await self.bot.say("You must join a voice channel before I can"
                                    " play anything.")
                 return
-            if not can_connect:
+            except UnauthorizedConnect:
                 await self.bot.say("I don't have permissions to join your"
                                    " voice channel.")
+                return
+            except UnauthorizedSpeak:
+                await self.bot.say("I don't have permissions to speak in your"
+                                   " voice channel.")
+                return
             else:
                 await self._join_voice_channel(voice_channel)
         else:  # We are connected but not to the right channel
@@ -1064,11 +1106,12 @@ class Audio:
             await self.bot.say("I'm already downloading a file!")
             return
 
-        if caller == "yt_search":
+        if "." in url:
+            if not self._valid_playable_url(url):
+                await self.bot.say("That's not a valid URL.")
+                return
+        else:
             url = "[SEARCH:]" + url
-        elif not self._valid_playable_url(url):
-            await self.bot.say("That's not a valid URL.")
-            return
 
         self._stop_player(server)
         self._clear_queue(server)
@@ -1122,7 +1165,7 @@ class Audio:
 
         if self._valid_playable_url(url):
             try:
-                await self.bot.say("Enumerating song list...this could take"
+                await self.bot.say("Enumerating song list... This could take"
                                    " a few moments.")
                 songlist = await self._parse_playlist(url)
             except InvalidPlaylist:
@@ -1136,7 +1179,8 @@ class Audio:
             playlist.server = server
 
             self._save_playlist(server, name, playlist)
-            await self.bot.say("Playlist '{}' saved.".format(name))
+            await self.bot.say("Playlist '{}' saved. Tracks: {}".format(name, 
+                len(songlist)))
         else:
             await self.bot.say("That URL is not a valid Soundcloud or YouTube"
                                " playlist link. If you think this is in error"
@@ -1146,9 +1190,29 @@ class Audio:
     @playlist.command(pass_context=True, no_pm=True, name="append")
     async def playlist_append(self, ctx, name, url):
         """Appends to a playlist."""
-        await self.bot.say("Not implemented.")
+        author = ctx.message.author
+        server = ctx.message.server
+        if name not in self._list_playlists(server):
+            await self.bot.say("There is no playlist with that name.")
+            return
+        playlist = self._load_playlist(server, name,
+                                local=self._playlist_exists_local(
+                                    server, name))
+        try:
+            playlist.append_song(author, url)
+        except UnauthorizedSave:
+            await self.bot.say("You're not the author of that playlist.")
+        except InvalidURL:
+            await self.bot.say("Invalid link.")
+        else:
+            await self.bot.say("Done.")
 
-    # TODO: playlist_extend
+    @playlist.command(pass_context=True, no_pm=True, name="extend")
+    async def playlist_extend(self, ctx, playlist_url_or_name):
+        """Extends a playlist with a playlist link"""
+        # Need better wording ^
+        await self.bot.say("Not implemented yet.")
+
 
     @playlist.command(pass_context=True, no_pm=True, name="list")
     async def playlist_list(self, ctx):
@@ -1202,6 +1266,7 @@ class Audio:
     async def playlist_start(self, ctx, name):
         """Plays a playlist."""
         server = ctx.message.server
+        author = ctx.message.author
         voice_channel = ctx.message.author.voice_channel
 
         caller = inspect.currentframe().f_back.f_code.co_name
@@ -1212,9 +1277,23 @@ class Audio:
             return
 
         if self._playlist_exists(server, name):
-            # TODO: permissions checks...
             if not self.voice_connected(server):
-                await self._join_voice_channel(voice_channel)
+                try:
+                    can_connect = self.has_connect_perm(author, server)
+                except AuthorNotConnected:
+                    await self.bot.say("You must join a voice channel before I can"
+                                       " play anything.")
+                    return
+                except UnauthorizedConnect:
+                    await self.bot.say("I don't have permissions to join your"
+                                       " voice channel.")
+                    return
+                except UnauthorizedSpeak:
+                    await self.bot.say("I don't have permissions to speak in your"
+                                       " voice channel.")
+                    return
+                else:
+                    await self._join_voice_channel(voice_channel)
             self._clear_queue(server)
             playlist = self._load_playlist(server, name,
                                            local=self._playlist_exists_local(
@@ -1233,7 +1312,7 @@ class Audio:
         await self.playlist_start.callback(self, ctx, name)
 
     @commands.command(pass_context=True, no_pm=True, name="queue")
-    async def _queue(self, ctx, url):
+    async def _queue(self, ctx, *, url):
         """Queues a song to play next. Extended functionality in `!help`
 
         If you use `queue` when one song is playing, your new song will get
@@ -1242,7 +1321,7 @@ class Audio:
             NOT stay in the playlist loop."""
         server = ctx.message.server
         if not self.voice_connected(server):
-            await self.bot.say("Not voice connected in this server.")
+            await ctx.invoke(self.play, url_or_search_terms=url)
             return
 
         # We are connected somewhere
@@ -1253,9 +1332,12 @@ class Audio:
                                     " queue to modify. This should never"
                                     " happen.")
 
-        if not self._valid_playable_url(url):
-            await self.bot.say("Invalid URL.")
-            return
+        if "." in url:
+            if not self._valid_playable_url(url):
+                await self.bot.say("That's not a valid URL.")
+                return
+        else:
+            url = "[SEARCH:]" + url
 
         # We have a queue to modify
         if self.queue[server.id]["PLAYLIST"]:
@@ -1349,7 +1431,7 @@ class Audio:
         ids = ("zGTkAVsrfg8", "cGMWL8cOeAU", "vFrjMq4aL-g", "WROI5WYBU_A",
                "41tIUr_ex3g", "f9O2Rjn1azc")
         url = "https://www.youtube.com/watch?v={}".format(choice(ids))
-        await self.play.callback(self, ctx, url)
+        await ctx.invoke(self.play, url_or_search_terms=url)
 
     @commands.command(pass_context=True, no_pm=True)
     async def song(self, ctx):
@@ -1378,8 +1460,8 @@ class Audio:
     @commands.command(name="yt", pass_context=True, no_pm=True)
     async def yt_search(self, ctx, *, search_terms: str):
         """Searches and plays a video from YouTube"""
-        await self.bot.say('This got broken. Will be fixed soon.')
-        # await self.play.callback(self, ctx, search_terms)
+        await self.bot.say("Searching...")
+        await ctx.invoke(self.play, url_or_search_terms=search_terms)
 
     def is_playing(self, server):
         if not self.voice_connected(server):
@@ -1469,7 +1551,11 @@ class Audio:
         channel = author.voice_channel
         if channel is None:
             raise AuthorNotConnected
-        if channel.permissions_for(server.me):
+        elif channel.permissions_for(server.me).connect is False:
+            raise UnauthorizedConnect
+        elif channel.permissions_for(server.me).speak is False:
+            raise UnauthorizedSpeak
+        else:
             return True
         return False
 
@@ -1644,7 +1730,7 @@ def setup(bot):
     try:
         bot.voice_clients
     except AttributeError:
-        raise discord.Forbidden(
+        raise RuntimeError(
             "Your discord.py is outdated. Update to the newest one with\npip3 "
             "install --upgrade git+https://github.com/Rapptz/discord.py@async")
     n = Audio(bot)  # Praise 26
