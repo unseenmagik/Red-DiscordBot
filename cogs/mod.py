@@ -85,6 +85,36 @@ class Mod:
             print(e)
 
     @commands.command(no_pm=True, pass_context=True)
+    @checks.admin_or_permissions(ban_members=True)
+    async def softban(self, ctx, user: discord.Member):
+        """Kicks the user, deleting 1 day worth of messages."""
+        server = ctx.message.server
+        channel = ctx.message.channel
+        can_ban = channel.permissions_for(server.me).ban_members
+        author = ctx.message.author
+        if can_ban:
+            try:
+                try: # We don't want blocked DMs preventing us from banning
+                    msg = await self.bot.send_message(user, "You have been banned and "
+                              "then unbanned as a quick way to delete your messages.\n"
+                              "You can now join the server again.")
+                except:
+                    pass
+                await self.bot.ban(user, 1)
+                logger.info("{}({}) softbanned {}({}), deleting 1 day worth " 
+                    "of messages".format(author.name, author.id, user.name,
+                     user.id))
+                await self.bot.unban(server, user)
+                await self.bot.say("Done. Enough chaos.")
+            except discord.errors.Forbidden:
+                await self.bot.say("My role is not high enough to softban that user.")
+                await self.bot.delete_message(msg)
+            except Exception as e:
+                print(e)
+        else:
+            await self.bot.say("I'm not allowed to do that.")
+
+    @commands.command(no_pm=True, pass_context=True)
     @checks.admin_or_permissions(manage_nicknames=True)
     async def rename(self, ctx, user : discord.Member, *, nickname=""):
         """Changes user's nickname
@@ -490,10 +520,9 @@ class Mod:
         Use double quotes if the role contains spaces.
         Colour must be in hexadecimal format.
         \"http://www.w3schools.com/colors/colors_picker.asp\"
-        #cefdf9 -> 0xcefdf9
         Examples:
-        !editrole colour \"The Transistor\" 0xffff00
-        !editrole colour Test 0xcefdf9"""
+        !editrole colour \"The Transistor\" #ff0000
+        !editrole colour Test #ff9900"""
         author = ctx.message.author
         try:
             await self.bot.edit_role(ctx.message.server, role, color=value)

@@ -131,13 +131,10 @@ class General:
             self.stopwatches.pop(author.id, None)
 
     @commands.command()
-    async def lmgtfy(self, *text):
+    async def lmgtfy(self, *, search_terms : str):
         """Creates a lmgtfy link"""
-        if text == ():
-            await self.bot.say("lmgtfy [search terms]")
-            return
-        text = "+".join(text)
-        await self.bot.say("http://lmgtfy.com/?q=" + text)
+        search_terms = search_terms.replace(" ", "+")
+        await self.bot.say("http://lmgtfy.com/?q={}".format(search_terms))
 
     @commands.command(no_pm=True, hidden=True)
     async def hug(self, user : discord.Member, intensity : int=1):
@@ -178,7 +175,7 @@ class General:
         await self.bot.say(data)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def server(self, ctx):
+    async def serverinfo(self, ctx):
         """Shows server's informations"""
         server = ctx.message.server
         online = str(len([m.status for m in server.members if str(m.status) == "online" or str(m.status) == "idle"]))
@@ -202,20 +199,38 @@ class General:
         await self.bot.say(data)
         
     @commands.command()
-    async def urban(self, *, search_terms : str):
-        """Urban Dictionary search"""
+    async def urban(self, *, search_terms : str, definition_number : int=1):
+        """Urban Dictionary search
+
+        Definition number must be between 1 and 10"""
+        # definition_number is just there to show up in the help
+        # all this mess is to avoid forcing double quotes on the user
         search_terms = search_terms.split(" ")
-        search_terms = "+".join(search_terms)
-        search = "http://api.urbandictionary.com/v0/define?term=" + search_terms
         try:
-            async with aiohttp.get(search) as r:
+            if len(search_terms) > 1:
+                pos = int(search_terms[-1]) - 1
+                search_terms = search_terms[:-1]
+            else:
+                pos = 0
+            if pos not in range(0, 11): # API only provides the
+                pos = 0                 # top 10 definitions
+        except ValueError:
+            pos = 0
+        search_terms = "+".join(search_terms)
+        url = "http://api.urbandictionary.com/v0/define?term=" + search_terms
+        try:
+            async with aiohttp.get(url) as r:
                 result = await r.json()
-            if result["list"] != []:
-                definition = result['list'][0]['definition']
-                example = result['list'][0]['example']
-                await self.bot.say("**Definition:** " + definition + "\n\n" + "**Example:** " + example )
+            if result["list"]:
+                definition = result['list'][pos]['definition']
+                example = result['list'][pos]['example']
+                defs = len(result['list'])
+                await self.bot.say("**Definition #{} out of {}:\n**{}\n\n"
+                    "**Example:\n**{}".format(pos+1, defs, definition, example))
             else:
                 await self.bot.say("Your search terms gave no results.")
+        except IndexError:
+            await self.bot.say("There is no definition #{}".format(pos+1))
         except:
             await self.bot.say("Error.")
 
