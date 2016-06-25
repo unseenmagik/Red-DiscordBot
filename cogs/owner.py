@@ -482,15 +482,6 @@ class Owner:
         except:
             await self.bot.say("I'm unable to deliver your message. Sorry.")
 
-    @commands.command()
-    async def info(self):
-        """Shows info about Red"""
-        await self.bot.say(
-        "This is an instance of Red, an open source Discord bot created by "
-        "Twentysix and improved by many.\n\n**Github:**\n"
-        "<https://github.com/Twentysix26/Red-DiscordBot/>\n"
-        "**Official server:**\n<https://discord.me/Red-DiscordBot>")
-
     async def leave_confirmation(self, server, owner, ctx):
         if not ctx.message.channel.is_private:
             current_server = ctx.message.server
