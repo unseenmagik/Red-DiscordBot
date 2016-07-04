@@ -316,7 +316,10 @@ def load_cogs():
         if extension.lower() == "cogs.owner":
             continue
         in_reg = extension in registry
-        if not (in_reg or no_prompt):
+        if in_reg is False:
+            if no_prompt is True:
+                registry[extension] = False
+                continue
             print("\nNew extension: {}".format(extension))
             print("Load it?(y/n)")
             if not get_answer():
@@ -369,8 +372,8 @@ def main():
         owner_cog.owner.hidden = True  # Hides the set owner command from help
     print("-- Logging in.. --")
     print("Make sure to keep your bot updated by using: git pull")
-    print("and: pip3 install --upgrade git+https://github.com/Rapptz/"
-          "discord.py@async")
+    print("and: pip3 install -U git+https://github.com/Rapptz/"
+          "discord.py@master#egg=discord.py[voice]")
     if settings.login_type == "token":
         owner_cog._token.hidden = True
         try:
