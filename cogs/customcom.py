@@ -4,6 +4,7 @@ from .utils.dataIO import fileIO
 from .utils import checks
 from __main__ import user_allowed, send_cmd_help
 import os
+import re
 
 class CustomCommands:
     """Custom commands."""
@@ -118,15 +119,51 @@ class CustomCommands:
             cmdlist = self.c_commands[server.id]
             cmd = msg[len(prefix):]
             if cmd in cmdlist.keys():
-                await self.bot.send_message(message.channel, cmdlist[cmd])
+                cmd = cmdlist[cmd]
+                cmd = self.format_cc(cmd, message)
+                await self.bot.send_message(message.channel, cmd)
             elif cmd.lower() in cmdlist.keys():
-                await self.bot.send_message(message.channel, cmdlist[cmd.lower()])
+                cmd = cmdlist[cmd.lower()]
+                cmd = self.format_cc(cmd, message)
+                await self.bot.send_message(message.channel, cmd)
 
     def get_prefix(self, msg):
         for p in self.bot.command_prefix:
             if msg.startswith(p):
                 return p
         return False
+
+    def format_cc(self, command, message):
+        results = re.findall("\{([^}]+)\}", command)
+        for result in results:
+            param = self.transform_parameter(result, message)
+            command = command.replace("{" + result + "}", param)
+        return command
+
+    def transform_parameter(self, result, message):
+        """
+        For security reasons only specific objects are allowed
+        Internals are ignored
+        """
+        raw_result = "{" + result + "}"
+        objects = {
+            "message" : message,
+            "author"  : message.author,
+            "channel" : message.channel,
+            "server"  : message.server
+        }
+        if result in objects:
+            return str(objects[result])
+        try:
+            first, second = result.split(".")
+        except ValueError:
+            return raw_result
+        if first in objects and not second.startswith("_"):
+            first = objects[first]
+        else:
+            return raw_result
+        return str(getattr(first, second, raw_result))
+
 
 def check_folders():
     if not os.path.exists("data/customcom"):
