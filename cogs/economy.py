@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from cogs.utils.dataIO import dataIO, fileIO
+from cogs.utils.dataIO import dataIO
 from collections import namedtuple, defaultdict
 from datetime import datetime
 from random import randint
@@ -23,30 +23,37 @@ slot_payouts = """Slot machine payouts:
     Three symbols: +500
     Two symbols: Bet * 2"""
 
+
 class BankError(Exception):
     pass
+
 
 class AccountAlreadyExists(BankError):
     pass
 
+
 class NoAccount(BankError):
     pass
+
 
 class InsufficientBalance(BankError):
     pass
 
+
 class NegativeValue(BankError):
     pass
 
+
 class SameSenderAndReceiver(BankError):
     pass
+
 
 class Bank:
     def __init__(self, bot, file_path):
         self.accounts = dataIO.load_json(file_path)
         self.bot = bot
 
-    def create_account(self, user):
+    def create_account(self, user, *, initial_balance=0):
         server = user.server
         if not self.account_exists(user):
             if server.id not in self.accounts:
@@ -54,10 +61,12 @@ class Bank:
             if user.id in self.accounts: # Legacy account
                 balance = self.accounts[user.id]["balance"]
             else:
-                balance = 0
+                balance = initial_balance
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            account = {"name" : user.name, "balance" : balance,
-            "created_at" : timestamp}
+            account = {"name" : user.name,
+                       "balance" : balance,
+                       "created_at" : timestamp
+                      }
             self.accounts[server.id][user.id] = account
             self._save_bank()
             return self.get_account(user)
@@ -104,7 +113,6 @@ class Bank:
         self._save_bank()
 
     def transfer_credits(self, sender, receiver, amount):
-        server = sender.server
         if amount < 0:
             raise NegativeValue()
         if sender is receiver:
@@ -193,7 +201,8 @@ class Economy:
         global default_settings
         self.bot = bot
         self.bank = Bank(bot, "data/economy/bank.json")
-        self.settings = fileIO("data/economy/settings.json", "load")
+        self.file_path = "data/economy/settings.json"
+        self.settings = dataIO.load_json(self.file_path)
         if "PAYDAY_TIME" in self.settings: #old format
             default_settings = self.settings
             self.settings = {}
@@ -403,38 +412,40 @@ class Economy:
             reels.append([reel[n - 1], reel[n], reel[n + 1]])
         line = [reels[0][1], reels[1][1], reels[2][1]]
 
-        display_reels = "\n  " + reels[0][0] + " " + reels[1][0] + " " + reels[2][0] + "\n"
+        display_reels = "~~\n~~  " + reels[0][0] + " " + reels[1][0] + " " + reels[2][0] + "\n"
         display_reels += ">" + reels[0][1] + " " + reels[1][1] + " " + reels[2][1] + "\n"
         display_reels += "  " + reels[0][2] + " " + reels[1][2] + " " + reels[2][2] + "\n"
 
         if line[0] == ":two:" and line[1] == ":two:" and line[2] == ":six:":
             bid = bid * 5000
-            await self.bot.send_message(message.channel, "{}{} 226! Your bet is multiplied * 5000! {}! ".format(display_reels, message.author.mention, str(bid)))
+            slotMsg = "{}{} 226! Your bet is multiplied * 5000! {}! ".format(display_reels, message.author.mention, str(bid))
         elif line[0] == ":four_leaf_clover:" and line[1] == ":four_leaf_clover:" and line[2] == ":four_leaf_clover:":
             bid += 1000
-            await self.bot.send_message(message.channel, "{}{} Three FLC! +1000! ".format(display_reels, message.author.mention))
+            slotMsg = "{}{} Three FLC! +1000! ".format(display_reels, message.author.mention)
         elif line[0] == ":cherries:" and line[1] == ":cherries:" and line[2] == ":cherries:":
             bid += 800
-            await self.bot.send_message(message.channel, "{}{} Three cherries! +800! ".format(display_reels, message.author.mention))
+            slotMsg = "{}{} Three cherries! +800! ".format(display_reels, message.author.mention)
         elif line[0] == line[1] == line[2]:
             bid += 500
-            await self.bot.send_message(message.channel, "{}{} Three symbols! +500! ".format(display_reels, message.author.mention))
+            slotMsg = "{}{} Three symbols! +500! ".format(display_reels, message.author.mention)
         elif line[0] == ":two:" and line[1] == ":six:" or line[1] == ":two:" and line[2] == ":six:":
             bid = bid * 4
-            await self.bot.send_message(message.channel, "{}{} 26! Your bet is multiplied * 4! {}! ".format(display_reels, message.author.mention, str(bid)))
+            slotMsg = "{}{} 26! Your bet is multiplied * 4! {}! ".format(display_reels, message.author.mention, str(bid))
         elif line[0] == ":cherries:" and line[1] == ":cherries:" or line[1] == ":cherries:" and line[2] == ":cherries:":
             bid = bid * 3
-            await self.bot.send_message(message.channel, "{}{} Two cherries! Your bet is multiplied * 3! {}! ".format(display_reels, message.author.mention, str(bid)))
+            slotMsg = "{}{} Two cherries! Your bet is multiplied * 3! {}! ".format(display_reels, message.author.mention, str(bid))
         elif line[0] == line[1] or line[1] == line[2]:
             bid = bid * 2
-            await self.bot.send_message(message.channel, "{}{} Two symbols! Your bet is multiplied * 2! {}! ".format(display_reels, message.author.mention, str(bid)))
+            slotMsg = "{}{} Two symbols! Your bet is multiplied * 2! {}! ".format(display_reels, message.author.mention, str(bid))
         else:
-            await self.bot.send_message(message.channel, "{}{} Nothing! Lost bet. ".format(display_reels, message.author.mention))
+            slotMsg = "{}{} Nothing! Lost bet. ".format(display_reels, message.author.mention)
             self.bank.withdraw_credits(message.author, bid)
-            await self.bot.send_message(message.channel, "Credits left: {}".format(self.bank.get_balance(message.author)))
+            slotMsg += "\n" + " Credits left: {}".format(self.bank.get_balance(message.author))
+            await self.bot.send_message(message.channel, slotMsg)
             return True
         self.bank.deposit_credits(message.author, bid)
-        await self.bot.send_message(message.channel, "Current credits: {}".format(self.bank.get_balance(message.author)))
+        slotMsg += "\n" + " Current credits: {}".format(self.bank.get_balance(message.author))
+        await self.bot.send_message(message.channel, slotMsg)
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.admin_or_permissions(manage_server=True)
@@ -456,7 +467,7 @@ class Economy:
         server = ctx.message.server
         self.settings[server.id]["SLOT_MIN"] = bid
         await self.bot.say("Minimum bid is now " + str(bid) + " credits.")
-        fileIO("data/economy/settings.json", "save", self.settings)
+        dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
     async def slotmax(self, ctx, bid : int):
@@ -464,7 +475,7 @@ class Economy:
         server = ctx.message.server
         self.settings[server.id]["SLOT_MAX"] = bid
         await self.bot.say("Maximum bid is now " + str(bid) + " credits.")
-        fileIO("data/economy/settings.json", "save", self.settings)
+        dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
     async def slottime(self, ctx, seconds : int):
@@ -472,7 +483,7 @@ class Economy:
         server = ctx.message.server
         self.settings[server.id]["SLOT_TIME"] = seconds
         await self.bot.say("Cooldown is now " + str(seconds) + " seconds.")
-        fileIO("data/economy/settings.json", "save", self.settings)
+        dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
     async def paydaytime(self, ctx, seconds : int):
@@ -480,7 +491,7 @@ class Economy:
         server = ctx.message.server
         self.settings[server.id]["PAYDAY_TIME"] = seconds
         await self.bot.say("Value modified. At least " + str(seconds) + " seconds must pass between each payday.")
-        fileIO("data/economy/settings.json", "save", self.settings)
+        dataIO.save_json(self.file_path, self.settings)
 
     @economyset.command(pass_context=True)
     async def paydaycredits(self, ctx, credits : int):
@@ -488,10 +499,10 @@ class Economy:
         server = ctx.message.server
         self.settings[server.id]["PAYDAY_CREDITS"] = credits
         await self.bot.say("Every payday will now give " + str(credits) + " credits.")
-        fileIO("data/economy/settings.json", "save", self.settings)
+        dataIO.save_json(self.file_path, self.settings)
 
-    def display_time(self, seconds, granularity=2): # What would I ever do without stackoverflow?
-        intervals = (                               # Source: http://stackoverflow.com/a/24542445
+    def display_time(self, seconds, granularity=2):  # What would I ever do without stackoverflow?
+        intervals = (                                # Source: http://stackoverflow.com/a/24542445
             ('weeks', 604800),  # 60 * 60 * 24 * 7
             ('days', 86400),    # 60 * 60 * 24
             ('hours', 3600),    # 60 * 60
@@ -510,29 +521,32 @@ class Economy:
                 result.append("{} {}".format(value, name))
         return ', '.join(result[:granularity])
 
+
 def check_folders():
     if not os.path.exists("data/economy"):
         print("Creating data/economy folder...")
         os.makedirs("data/economy")
 
+
 def check_files():
 
     f = "data/economy/settings.json"
-    if not fileIO(f, "check"):
+    if not dataIO.is_valid_json(f):
         print("Creating default economy's settings.json...")
-        fileIO(f, "save", {})
+        dataIO.save_json(f, {})
 
     f = "data/economy/bank.json"
-    if not fileIO(f, "check"):
+    if not dataIO.is_valid_json(f):
         print("Creating empty bank.json...")
-        fileIO(f, "save", {})
+        dataIO.save_json(f, {})
+
 
 def setup(bot):
     global logger
     check_folders()
     check_files()
     logger = logging.getLogger("red.economy")
-    if logger.level == 0: # Prevents the logger from being loaded again in case of module reload
+    if logger.level == 0:  # Prevents the logger from being loaded again in case of module reload
         logger.setLevel(logging.INFO)
         handler = logging.FileHandler(filename='data/economy/economy.log', encoding='utf-8', mode='a')
         handler.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt="[%d/%m/%Y %H:%M]"))

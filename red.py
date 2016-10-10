@@ -21,9 +21,7 @@ import traceback
 #             https://github.com/Rapptz/RoboDanny/tree/async
 #
 
-description = """
-Red - A multifunction Discord bot by Twentysix
-"""
+description = "Red - A multifunction Discord bot by Twentysix"
 
 formatter = commands.HelpFormatter(show_check_failure=False)
 
@@ -31,8 +29,6 @@ bot = commands.Bot(command_prefix=["_"], formatter=formatter,
                    description=description, pm_help=None)
 
 settings = Settings()
-
-from cogs.utils import checks
 
 
 @bot.event
@@ -80,24 +76,27 @@ async def on_message(message):
 
 @bot.event
 async def on_command_error(error, ctx):
+    channel = ctx.message.channel
     if isinstance(error, commands.MissingRequiredArgument):
         await send_cmd_help(ctx)
     elif isinstance(error, commands.BadArgument):
         await send_cmd_help(ctx)
     elif isinstance(error, commands.DisabledCommand):
-        await bot.send_message(ctx.message.channel,
-            "That command is disabled.")
+        await bot.send_message(channel, "That command is disabled.")
     elif isinstance(error, commands.CommandInvokeError):
         logger.exception("Exception in command '{}'".format(
             ctx.command.qualified_name), exc_info=error.original)
         oneliner = "Error in command '{}' - {}: {}".format(
             ctx.command.qualified_name, type(error.original).__name__,
             str(error.original))
-        await ctx.bot.send_message(ctx.message.channel, inline(oneliner))
+        await ctx.bot.send_message(channel, inline(oneliner))
     elif isinstance(error, commands.CommandNotFound):
         pass
     elif isinstance(error, commands.CheckFailure):
         pass
+    elif isinstance(error, commands.NoPrivateMessage):
+        await bot.send_message(channel, "That command is not "
+                                        "available in DMs.")
     else:
         logger.exception(type(error).__name__, exc_info=error)
 
@@ -117,6 +116,9 @@ def user_allowed(message):
     author = message.author
 
     mod = bot.get_cog('Mod')
+
+    if author.bot:
+        return False
 
     if mod is not None:
         if settings.owner == author.id:
@@ -367,7 +369,6 @@ def load_cogs():
 
 def main():
     global settings
-    global checks
 
     check_folders()
     check_configs()
@@ -388,9 +389,14 @@ def main():
     else:
         owner_cog.owner.hidden = True  # Hides the set owner command from help
     print("-- Logging in.. --")
-    print("Make sure to keep your bot updated by using: git pull")
-    print("and: pip3 install -U git+https://github.com/Rapptz/"
-          "discord.py@master#egg=discord.py[voice]")
+    if os.name == "nt" and os.path.isfile("update.bat"):
+        print("Make sure to keep your bot updated by running the file "
+              "update.bat")
+    else:
+        print("Make sure to keep your bot updated by using: git pull")
+        print("and: pip3 install -U git+https://github.com/Rapptz/"
+              "discord.py@master#egg=discord.py[voice]")
+    print("Official server: https://discord.me/Red-DiscordBot")
     if settings.login_type == "token":
         try:
             yield from bot.login(settings.email)
@@ -406,10 +412,12 @@ def main():
     yield from bot.connect()
 
 if __name__ == '__main__':
+    error = False
     loop = asyncio.get_event_loop()
     try:
         loop.run_until_complete(main())
     except discord.LoginFailure:
+        error = True
         logger.error(traceback.format_exc())
         choice = input("Invalid login credentials. "
             "If they worked before Discord might be having temporary "
@@ -421,8 +429,13 @@ if __name__ == '__main__':
             shutil.copy('data/red/settings.json',
                         'data/red/settings-{}.bak'.format(int(time.time())))
             os.remove('data/red/settings.json')
+    except KeyboardInterrupt:
+        loop.run_until_complete(bot.logout())
     except:
+        error = True
         logger.error(traceback.format_exc())
         loop.run_until_complete(bot.logout())
     finally:
         loop.close()
+        if error:
+            exit(1)
