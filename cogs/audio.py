@@ -14,6 +14,7 @@ import asyncio
 import math
 import time
 import inspect
+import subprocess
 
 __author__ = "tekulvw"
 __version__ = "0.1.1"
@@ -232,7 +233,7 @@ class Downloader(threading.Thread):
 class Audio:
     """Music Streaming."""
 
-    def __init__(self, bot):
+    def __init__(self, bot, player):
         self.bot = bot
         self.queue = {}  # add deque's, repeat
         self.downloaders = {}  # sid: object
@@ -244,6 +245,12 @@ class Audio:
         self._old_game = False
 
         self.skip_votes = {}
+
+        if player == "ffmpeg":
+            self.settings["AVCONV"] = False
+        elif player == "avconv":
+            self.settings["AVCONV"] = True
+        self.save_settings()
 
     async def _add_song_status(self, song):
         if self._old_game is False:
@@ -405,7 +412,7 @@ class Audio:
         while any([d.is_alive() for d in downloaders]):
             await asyncio.sleep(0.1)
 
-        songs = [d.song for d in downloaders]
+        songs = [d.song for d in downloaders if d.song is not None]
         return songs
 
     async def _download_next(self, server, curr_dl, next_dl):
@@ -1756,7 +1763,11 @@ class Audio:
                 song.uploader = None
             if hasattr(song, 'duration'):
                 m, s = divmod(song.duration, 60)
-                dur = "{:.0f}:{:.0f}".format(m, s)
+                h, m = divmod(m, 60)
+                if h:
+                    dur = "{0}:{1:0>2}:{2:0>2}".format(h, m, s)
+                else:
+                    dur = "{0}:{1:0>2}".format(m, s)
             else:
                 dur = None
             msg = ("\n**Title:** {}\n**Author:** {}\n**Uploader:** {}\n"
@@ -1835,12 +1846,10 @@ class Audio:
                     stop_times[server] = int(time.time())
 
                 if hasattr(vc, 'audio_player'):
-                    if vc.audio_player.is_done() and \
-                            (server not in stop_times or
-                             stop_times[server] is None):
-                        log.debug("putting sid {} in stop loop".format(
-                            server.id))
-                        stop_times[server] = int(time.time())
+                    if (vc.audio_player.is_done() or len(vc.channel.voice_members) == 1):
+                        if server not in stop_times or stop_times[server] is None:
+                            log.debug("putting sid {} in stop loop".format(server.id))
+                            stop_times[server] = int(time.time())
                     elif vc.audio_player.is_playing():
                         stop_times[server] = None
 
@@ -1849,7 +1858,8 @@ class Audio:
                         int(time.time()) - stop_times[server] > 300:
                     # 5 min not playing to d/c
                     log.debug("dcing from sid {} after 300s".format(server.id))
-                    await self._disconnect_voice_client(server)
+                    self._clear_queue(server)
+                    await self._stop_and_disconnect(server)
                     stop_times[server] = None
             await asyncio.sleep(5)
 
@@ -2053,10 +2063,25 @@ def check_files():
                         "Adding " + str(key) + " field to audio settings.json")
             dataIO.save_json(settings_path, current)
 
+def verify_ffmpeg_avconv():
+    try:
+        subprocess.call(["ffmpeg", "-version"], stdout=subprocess.DEVNULL)
+    except FileNotFoundError:
+        pass
+    else:
+        return "ffmpeg"
+
+    try:
+        subprocess.call(["avconv", "-version"], stdout=subprocess.DEVNULL)
+    except FileNotFoundError:
+        return False
+    else:
+        return "avconv"
 
 def setup(bot):
     check_folders()
     check_files()
+    
     if youtube_dl is None:
         raise RuntimeError("You need to run `pip3 install youtube_dl`")
     if opus is False:
@@ -2067,13 +2092,21 @@ def setup(bot):
         raise RuntimeError(
             "You need to install ffmpeg and opus. See \"https://github.com/"
             "Twentysix26/Red-DiscordBot/wiki/Requirements\"")
-    try:
-        bot.voice_clients
-    except AttributeError:
+
+    player = verify_ffmpeg_avconv()
+
+    if not player:
+        if os.name == "nt":
+            msg = "ffmpeg isn't installed"
+        else:
+            msg = "Neither ffmpeg nor avconv are installed"
         raise RuntimeError(
-            "Your discord.py is outdated. Update to the newest one with\npip3 "
-            "install --upgrade git+https://github.com/Rapptz/discord.py@async")
-    n = Audio(bot)  # Praise 26
+          "{}.\nConsult the guide for your operating system "
+          "and do ALL the steps in order.\n"
+          "https://twentysix26.github.io/Red-Docs/\n"
+          "".format(msg))
+    
+    n = Audio(bot, player=player)  # Praise 26
     bot.add_cog(n)
     bot.add_listener(n.voice_state_update, 'on_voice_state_update')
     bot.loop.create_task(n.queue_scheduler())
