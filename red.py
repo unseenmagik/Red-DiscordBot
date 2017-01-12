@@ -1,4 +1,5 @@
 import asyncio
+import uvloop
 import os
 import sys
 import logging
@@ -43,6 +44,8 @@ from io import TextIOWrapper
 #
 
 description = "Red - A multifunction Discord bot by Twentysix"
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 class Bot(commands.Bot):
