@@ -18,6 +18,14 @@ NUM_THREADS = 4
 REPO_NONEX = 0x1
 REPO_CLONE = 0x2
 REPO_SAME = 0x4
+REPOS_LIST = "https://twentysix26.github.io/Red-Docs/red_cog_approved_repos/"
+
+DISCLAIMER = ("You're about to add a 3rd party repository. The creator of Red"
+              " and its community have no responsibility for any potential "
+              "damage that the content of 3rd party repositories might cause."
+              "\nBy typing 'I agree' you declare to have read and understand "
+              "the above message. This message won't be shown again until the"
+              " next reboot.")
 
 
 class UpdateError(Exception):
@@ -37,6 +45,7 @@ class Downloader:
 
     def __init__(self, bot):
         self.bot = bot
+        self.disclaimer_accepted = False
         self.path = "data/downloader/"
         self.file_path = "data/downloader/repos.json"
         # {name:{url,cog1:{installed},cog1:{installed}}}
@@ -68,24 +77,18 @@ class Downloader:
 
         Warning: Adding 3RD Party Repositories is at your own
         Risk."""
-        await self.bot.say("Type 'I agree' to confirm "
-                           "adding a 3rd party repo. This has the possibility"
-                           " of being harmful. You will not receive help "
-                           "in Red - Discord Bot #support for any cogs "
-                           "installed from this repo. If you do require "
-                           "support you should contact the owner of this "
-                           "repo.\n\nAgain, ANY repo you add is at YOUR"
-                           " discretion and the creator of Red has "
-                           "ABSOLUTELY ZERO responsibility to help if "
-                           "something goes wrong.")
-        answer = await self.bot.wait_for_message(timeout=15,
-                                                 author=ctx.message.author)
-        if answer is None:
-            await self.bot.say('Not adding repo.')
-            return
-        elif "i agree" not in answer.content.lower():
-            await self.bot.say('Not adding repo.')
-            return
+        if not self.disclaimer_accepted:
+            await self.bot.say(DISCLAIMER)
+            answer = await self.bot.wait_for_message(timeout=30,
+                                                     author=ctx.message.author)
+            if answer is None:
+                await self.bot.say('Not adding repo.')
+                return
+            elif "i agree" not in answer.content.lower():
+                await self.bot.say('Not adding repo.')
+                return
+            else:
+                self.disclaimer_accepted = True
         self.repos[repo_name] = {}
         self.repos[repo_name]['url'] = repo_url
         try:
@@ -117,7 +120,10 @@ class Downloader:
 
     @cog.command(name="list")
     async def _send_list(self, repo_name=None):
-        """Lists installable cogs"""
+        """Lists installable cogs
+
+        Repositories list:
+        https://twentysix26.github.io/Red-Docs/red_cog_approved_repos/"""
         retlist = []
         if repo_name and repo_name in self.repos:
             msg = "Available cogs:\n"
@@ -130,17 +136,23 @@ class Downloader:
                 else:
                     retlist.append([cog, ''])
         else:
-            msg = "Available repos:\n"
-            for repo_name in sorted(self.repos.keys()):
-                data = self.get_info_data(repo_name)
-                if data:
-                    retlist.append([repo_name, data.get("SHORT", "")])
-                else:
-                    retlist.append([repo_name, ""])
+            if self.repos:
+                msg = "Available repos:\n"
+                for repo_name in sorted(self.repos.keys()):
+                    data = self.get_info_data(repo_name)
+                    if data:
+                        retlist.append([repo_name, data.get("SHORT", "")])
+                    else:
+                        retlist.append([repo_name, ""])
+            else:
+                await self.bot.say("You haven't added a repository yet.\n"
+                                   "Start now! {}".format(REPOS_LIST))
+                return
 
         col_width = max(len(row[0]) for row in retlist) + 2
         for row in retlist:
             msg += "\t" + "".join(word.ljust(col_width) for word in row) + "\n"
+        msg += "\nRepositories list: {}".format(REPOS_LIST)
         for page in pagify(msg, delims=['\n'], shorten_by=8):
             await self.bot.say(box(page))
 
@@ -569,7 +581,7 @@ class Downloader:
                 if p.returncode != 0:
                     raise UpdateError("Unable to determine old commit hash")
                 oldhash = p.stdout.decode().strip()
-                p = run(["git", "-C", dd + name, "pull", "-q"])
+                p = run(["git", "-C", dd + name, "pull", "-q", "--ff-only"])
                 if p.returncode != 0:
                     raise UpdateError("Error pulling updates")
                 p = run(rpcmd, stdout=PIPE)
@@ -626,13 +638,10 @@ def check_folders():
 
 
 def check_files():
-    repos = \
-        {'community': {'url': "https://github.com/Twentysix26/Red-Cogs.git"}}
-
     f = "data/downloader/repos.json"
     if not dataIO.is_valid_json(f):
         print("Creating default data/downloader/repos.json")
-        dataIO.save_json(f, repos)
+        dataIO.save_json(f, {})
 
 
 def setup(bot):
