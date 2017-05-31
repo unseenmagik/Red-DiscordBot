@@ -140,6 +140,13 @@ class BaseConfig:
         """Clears all values in the current context ONLY."""
         raise NotImplemented
 
+    def clear_all(self):
+        """
+        When used on a:
+            Member - Clears all members from same server
+        """
+        raise NotImplementedError()
+
     def set(self, key, value):
         """This should set config key with value `value` in the
             corresponding collection as defined by `self.collection` and
@@ -478,6 +485,13 @@ class Config(BaseConfig):
         await self.driver_setmap[self.collection](
             self.cog_name, self.uuid, self.collection_uuid, None, None,
             clear=True)
+
+    async def clear_all(self):
+        if self.collection == "MEMBER":
+            _, sid = self.collection_uuid
+            await self.driver.clear_all_members_in_guild(
+                self.cog_name, self.uuid, sid
+            )
 
     def guild(self, guild):
         new = type(self)(self.cog_name, self.uuid, self.driver,

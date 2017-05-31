@@ -122,6 +122,14 @@ class JSON(BaseDriver):
                 self.data[ident]["MEMBER"][user_id][guild_id][key] = value
         await self.jsonIO._threadsafe_save_json(self.data)
 
+    async def clear_all_members_in_guild(self, cog_name, ident, guild_id):
+        for user_id in self.data[ident]["MEMBER"]:
+            try:
+                del self.data[ident]["MEMBER"][user_id][guild_id]
+            except KeyError:
+                pass
+        await self.jsonIO._threadsafe_save_json(self.data)
+
     async def set_user(self, cog_name, ident, user_id, key, value, clear=False):
         user_id = str(user_id)
         if clear:

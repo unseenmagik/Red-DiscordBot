@@ -43,3 +43,6 @@ class BaseDriver:
 
     async def set_misc(self, cog_name, ident, value, clear=False):
         raise NotImplementedError()
+
+    async def clear_all_members_in_guild(self, cog_name, ident, guild_id):
+        raise NotImplementedError()
