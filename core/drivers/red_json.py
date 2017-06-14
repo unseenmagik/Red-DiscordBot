@@ -123,6 +123,7 @@ class JSON(BaseDriver):
         await self.jsonIO._threadsafe_save_json(self.data)
 
     async def clear_all_members_in_guild(self, cog_name, ident, guild_id):
+        guild_id = str(guild_id)
         for user_id in self.data[ident]["MEMBER"]:
             try:
                 del self.data[ident]["MEMBER"][user_id][guild_id]
